@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condutividade Elétrica de Soluções — Laboratório de Química</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===================== TOKENS ===================== */
+:root{
+  --bg:#0B1220;
+  --panel-1:#121B30;
+  --panel-2:#182140;
+  --panel-3:#1D2A4D;
+  --border:#28375C;
+  --border-soft:#20304f;
+  --text:#E8ECF6;
+  --text-dim:#93A5C9;
+  --text-faint:#6B82AE;
+
+  --teal:#4FD1C5;
+  --teal-ink:#06231f;
+  --amber:#F2A65A;
+  --violet:#C9A6F5;
+  --skyblue:#7DD3FC;
+  --yellow:#FBE38A;
+  --coral:#F0708A;
+  --green:#6FCF97;
+
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --radius-lg:18px;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse 1200px 700px at 50% -10%, #1a2748 0%, var(--bg) 55%),
+    var(--bg);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; letter-spacing:0.2px; }
+p{ margin:0; }
+button{ font-family:inherit; color:inherit; }
+::selection{ background:rgba(79,209,197,0.3); }
+:focus-visible{ outline:2px solid var(--skyblue); outline-offset:2px; }
+.svg-defs{ position:absolute; width:0; height:0; overflow:hidden; }
+
+/* ===================== SHELL / HEADER ===================== */
+.app-shell{ max-width:1180px; margin:0 auto; padding:0 18px 64px; }
+.site-header{ padding:24px 2px 16px; }
+.eyebrow{ font-family:var(--font-mono); font-size:12.5px; color:var(--teal); letter-spacing:0.5px; }
+.hero-title{ font-size:clamp(26px, 5.4vw, 44px); margin-top:8px; line-height:1.12; }
+.hero-fact{
+  margin-top:12px; font-family:var(--font-mono); font-size:12px; color:var(--skyblue);
+  background:var(--panel-1); border:1px solid var(--border-soft);
+  display:inline-block; padding:7px 12px; border-radius:8px;
+}
+
+/* ===================== NAV ===================== */
+.nav-bar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; gap:10px;
+  margin:0 -18px 20px; padding:10px 18px;
+  background:rgba(11,18,32,0.9);
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-soft);
+}
+.area-nav{
+  flex:1; max-width:620px;
+  display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:4px;
+  padding:4px; background:var(--panel-1); border:1px solid var(--border); border-radius:14px;
+}
+.area-nav button{
+  border:0; background:transparent; color:var(--text-dim);
+  padding:8px 4px 7px; border-radius:10px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  transition:background .15s, color .15s;
+}
+.nav-label{ font-weight:700; font-size:13.5px; letter-spacing:0.6px; text-transform:uppercase; }
+.nav-sub{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); }
+.area-nav button:hover{ color:var(--text); background:var(--panel-3); }
+.area-nav button.active{ background:var(--teal); color:var(--teal-ink); box-shadow:0 4px 16px rgba(79,209,197,0.25); }
+.area-nav button.active .nav-sub{ color:rgba(6,35,31,0.75); }
+.howto-btn{
+  margin-left:auto; flex-shrink:0;
+  background:var(--panel-1); border:1px solid var(--border); color:var(--text);
+  min-height:44px; padding:0 16px; border-radius:999px; cursor:pointer; font-size:13.5px; font-weight:500;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.howto-btn:hover{ border-color:var(--teal); }
+.howto-btn .icon{
+  font-family:var(--font-mono); font-size:12px; width:20px; height:20px; border-radius:50%;
+  border:1.5px solid var(--teal); color:var(--teal);
+  display:inline-flex; align-items:center; justify-content:center;
+}
+
+/* ===================== VIEWS / PANELS / BUTTONS ===================== */
+.view{ display:none; }
+.view.active{ display:block; animation:fadein .25s ease; }
+@keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+
+.panel{ background:var(--panel-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; min-width:0; }
+.panel-title{
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:0.6px; color:var(--text-faint);
+  margin-bottom:12px; display:flex; align-items:center; gap:8px;
+}
+.panel-title::after{ content:''; flex:1; height:1px; background:var(--border-soft); }
+.step-n{
+  width:21px; height:21px; border-radius:50%; flex-shrink:0;
+  background:rgba(79,209,197,0.14); color:var(--teal);
+  display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:600;
+}
+
+.btn{
+  border:none; border-radius:10px; padding:10px 18px; min-height:44px;
+  font-weight:600; font-size:14px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  transition:filter .15s, transform .1s, border-color .15s, opacity .15s;
+}
+.btn:active{ transform:translateY(1px); }
+.btn:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+.btn-primary{ background:var(--teal); color:var(--teal-ink); box-shadow:0 4px 16px rgba(79,209,197,0.22); }
+.btn-primary:hover:not(:disabled){ filter:brightness(1.08); }
+.btn-ghost{ background:var(--panel-1); border:1px solid var(--border); color:var(--text); }
+.btn-ghost:hover{ border-color:var(--teal); }
+.btn-sm{ min-height:36px; padding:6px 12px; font-size:13px; border-radius:9px; }
+
+/* ===================== SVG: COMPONENTES COMPARTILHADOS ===================== */
+.wire{ fill:none; stroke:#34466f; stroke-width:4; stroke-linecap:round; stroke-linejoin:round; transition:stroke .3s; }
+.wire.energized{ stroke:#4a5f92; }
+.wire.flowing{ stroke:var(--teal); stroke-dasharray:10 8; animation-duration:0.7s; }
+@media (prefers-reduced-motion: no-preference){
+  .wire.flowing{ animation-name:dashmove; animation-timing-function:linear; animation-iteration-count:infinite; }
+}
+@keyframes dashmove{ to{ stroke-dashoffset:-36; } }
+
+.battery-body{ fill:var(--panel-3); stroke:#4a5f92; stroke-width:2; }
+.battery-nub{ fill:#4a5f92; }
+.sign-plus{ fill:var(--amber); font-family:var(--font-mono); font-weight:600; }
+.sign-minus{ fill:var(--skyblue); font-family:var(--font-mono); font-weight:600; }
+.svg-label{ font-family:var(--font-mono); font-size:13px; fill:var(--text-faint); letter-spacing:0.6px; }
+
+.led-leg{ stroke:#8b95a8; stroke-width:3; fill:none; }
+.led-rim{ fill:#3a4870; }
+.led-dome{ fill:#26314d; stroke:#5a6a94; stroke-width:2; transition:fill .35s, fill-opacity .35s, stroke .35s; }
+.led-dome.lit{ stroke:#FFF3B0; }
+.led-hl{ fill:#ffffff; opacity:0.12; transition:opacity .35s; }
+.led-glow{ opacity:0; transition:opacity .4s, r .4s; }
+@media (prefers-reduced-motion: no-preference){
+  .led-glow-g.lit{ animation:ledpulse 2.6s ease-in-out infinite; }
+}
+@keyframes ledpulse{ 50%{ opacity:0.8; } }
+.led-state{ font-family:var(--font-mono); font-size:15px; font-weight:600; letter-spacing:0.8px; transition:fill .3s; }
+
+.beaker-glass{ fill:none; stroke:#4a5f92; stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; }
+.beaker-liquid{ transition:fill .4s; }
+.liquid-surface{ stroke:rgba(232,236,246,0.25); stroke-width:1.5; }
+.beaker-tick{ stroke:#4a5f92; stroke-width:1.5; }
+
+/* ===================== LABORATÓRIO ===================== */
+.lab-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);
+  gap:16px; align-items:start;
+}
+.lab-side{ display:flex; flex-direction:column; gap:16px; min-width:0; }
+@media (max-width:900px){
+  .lab-grid{ grid-template-columns:minmax(0,1fr); }
+  .lab-side{ display:contents; }
+  .card-picker{ order:1; }
+  .lab-bench{ order:2; }
+  .card-result{ order:3; }
+}
+
+/* soluções */
+.flask-grid{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:7px; }
+.flask-btn{
+  position:relative;
+  background:var(--panel-1); border:1px solid var(--border); border-radius:11px;
+  padding:6px 26px 6px 9px; min-height:44px; cursor:pointer; color:var(--text-dim);
+  display:flex; flex-direction:row; align-items:center; gap:8px;
+  text-align:left; transition:border-color .15s, background .15s, color .15s;
+}
+.flask-btn svg{ flex-shrink:0; }
+.flask-btn:hover{ border-color:var(--teal); color:var(--text); }
+.flask-btn.selected{ border-color:var(--teal); background:rgba(79,209,197,0.1); color:var(--text); box-shadow:inset 0 0 0 1px var(--teal); }
+.flask-btn.selected::after{ content:'✓'; position:absolute; top:50%; right:9px; transform:translateY(-50%); font-size:12px; font-weight:700; color:var(--teal); }
+.flask-name{ font-size:13px; line-height:1.25; font-weight:500; }
+
+/* bancada */
+.lab-bench{ border-color:#2f4370; }
+.bench-head{ display:flex; justify-content:space-between; align-items:center; gap:8px 10px; flex-wrap:wrap; margin-bottom:8px; }
+.sample-line{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0; }
+.sample-swatch{ width:12px; height:12px; border-radius:4px; flex-shrink:0; }
+.sample-name{ font-family:var(--font-display); font-size:20px; font-weight:600; line-height:1.2; }
+.type-chip{ font-family:var(--font-mono); font-size:11px; padding:3px 9px; border-radius:999px; border:1px solid; white-space:nowrap; }
+.type-chip.strong{ color:var(--green); border-color:rgba(111,207,151,0.45); background:rgba(111,207,151,0.1); }
+.type-chip.weak{ color:var(--amber); border-color:rgba(242,166,90,0.45); background:rgba(242,166,90,0.1); }
+.type-chip.none{ color:var(--skyblue); border-color:rgba(125,211,252,0.4); background:rgba(125,211,252,0.08); }
+.circuit-chip{
+  font-family:var(--font-mono); font-size:11px; padding:5px 10px; border-radius:999px;
+  display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+  border:1px solid var(--border); background:var(--panel-1);
+}
+.circuit-chip::before{ content:''; width:7px; height:7px; border-radius:50%; background:currentColor; }
+.circuit-chip.open{ color:var(--coral); }
+.circuit-chip.closed{ color:var(--green); }
+
+.bench-stage{ background:var(--panel-1); border:1px solid var(--border); border-radius:14px; padding:6px; }
+.bench-inner{ position:relative; width:100%; max-width:470px; margin:0 auto; aspect-ratio:360 / 420; }
+.bench-inner > svg{ position:absolute; inset:0; width:100%; height:100%; display:block; overflow:visible; }
+.particles-wrap{ position:absolute; overflow:hidden; pointer-events:none; }
+.particles-wrap canvas{ width:100%; height:100%; display:block; }
+
+/* eletrodos (interativos) */
+.electrode-rod{
+  position:absolute; z-index:2;
+  width:12px; border-radius:3px;
+  background:linear-gradient(90deg,#8b95a8,#d6dce8 40%,#8b95a8);
+  border:1px solid #566079;
+  cursor:grab; touch-action:none;
+  transition:height .45s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+}
+.electrode-rod::before{ content:''; position:absolute; inset:-8px -16px; }
+.electrode-rod:hover{ box-shadow:0 0 0 3px rgba(79,209,197,0.35); }
+.electrode-rod:active{ cursor:grabbing; }
+.electrode-rod.inserted{ box-shadow:0 0 12px rgba(79,209,197,0.5); }
+.rod-tip{ position:absolute; left:50%; bottom:-3px; width:8px; height:8px; transform:translateX(-50%); border-radius:50%; background:#d6dce8; }
+.rod-cap{
+  position:absolute; top:-7px; left:50%; transform:translateX(-50%);
+  width:22px; height:12px; border-radius:3px;
+  background:var(--teal); border:1.5px solid #E8FFFC;
+}
+.electrode-tag{
+  position:absolute; top:-10px; right:calc(100% + 10px);
+  font-family:var(--font-mono); font-size:12px; font-weight:600; line-height:1;
+  padding:4px 7px; border-radius:6px; white-space:nowrap;
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+  pointer-events:none;
+}
+.electrode-rod[data-electrode="B"] .electrode-tag{ right:auto; left:calc(100% + 10px); }
+.pole-plus{ color:var(--amber); }
+.pole-minus{ color:var(--skyblue); }
+.rod-hint{
+  position:absolute; left:50%; bottom:-22px; margin-left:-8px; width:0; height:0;
+  border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid var(--teal);
+  pointer-events:none;
+}
+@media (prefers-reduced-motion: no-preference){ .rod-hint{ animation:bob 1.1s ease-in-out infinite; } }
+@keyframes bob{ 50%{ transform:translateY(6px); } }
+.electrode-rod.inserted .rod-hint{ display:none; }
+
+.act-btn{
+  width:100%; margin-top:10px; min-height:48px;
+  background:rgba(79,209,197,0.1); border:1.5px solid var(--teal); color:var(--text);
+  border-radius:12px; font-size:15px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  transition:background .15s, transform .1s;
+}
+.act-btn:hover{ background:rgba(79,209,197,0.18); }
+.act-btn:active{ transform:translateY(1px); }
+.act-btn .arrow{ color:var(--teal); font-size:16px; line-height:1; transition:transform .25s; }
+.act-btn.is-in .arrow{ transform:rotate(180deg); }
+
+/* concentração (controle importante) */
+.conc-block{ margin-top:10px; padding:12px 14px 10px; border-radius:14px; background:var(--panel-1); border:1px solid rgba(79,209,197,0.4); }
+.conc-head{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.conc-title{ font-weight:600; font-size:14px; display:flex; align-items:center; gap:7px; }
+.conc-title .drag-ico{ font-family:var(--font-mono); color:var(--teal); }
+.conc-pill{ font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--teal-ink); background:var(--teal); padding:2px 10px; border-radius:999px; white-space:nowrap; }
+.conc-pill small{ font-size:11px; opacity:0.7; font-weight:500; }
+.conc-range{ -webkit-appearance:none; appearance:none; width:100%; height:32px; margin:2px 0 0; background:transparent; cursor:pointer; --fill:50%; }
+.conc-range:focus{ outline:none; }
+.conc-range:focus-visible{ outline:2px solid var(--skyblue); outline-offset:2px; border-radius:6px; }
+.conc-range::-webkit-slider-runnable-track{ height:8px; border-radius:999px; background:linear-gradient(90deg, var(--teal) 0, var(--teal) var(--fill), var(--border) var(--fill), var(--border) 100%); }
+.conc-range::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:24px; height:24px; margin-top:-8px; border-radius:50%;
+  background:#E8FFFC; border:5px solid var(--teal);
+  box-shadow:0 0 0 5px rgba(79,209,197,0.2), 0 2px 6px rgba(0,0,0,0.45);
+}
+.conc-range::-moz-range-track{ height:8px; border-radius:999px; background:var(--border); }
+.conc-range::-moz-range-progress{ height:8px; border-radius:999px; background:var(--teal); }
+.conc-range::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#E8FFFC; border:5px solid var(--teal); box-shadow:0 0 0 5px rgba(79,209,197,0.2); }
+.conc-scale{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); }
+.conc-fixed{ margin-top:10px; padding:10px 14px; border-radius:14px; background:var(--panel-1); border:1px dashed var(--border); font-size:13px; color:var(--text-faint); }
+
+.ion-legend{ display:flex; gap:6px 14px; flex-wrap:wrap; margin-top:12px; font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); }
+.ion-legend > span{ display:inline-flex; align-items:center; gap:6px; }
+.lg-ion{
+  width:16px; height:16px; border-radius:50%; flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:#0B1220; line-height:1; font-style:normal;
+}
+.lg-mol{ width:14px; height:14px; border-radius:50%; border:2px solid; flex-shrink:0; }
+.particle-behavior{ margin-top:6px; font-size:13px; color:var(--text-faint); line-height:1.45; }
+
+/* resultado (secundário ao LED) */
+.result-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.result-k{ font-family:var(--font-mono); font-size:11px; color:var(--text-faint); letter-spacing:0.4px; }
+.result-level{ font-family:var(--font-display); font-size:34px; line-height:1.05; font-weight:700; transition:color .25s; }
+.lvl-alta{ color:var(--green); }
+.lvl-media{ color:var(--amber); }
+.lvl-baixa{ color:var(--skyblue); }
+.lvl-wait{ color:var(--text-faint); }
+.led-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:7px 12px; border-radius:999px; background:var(--panel-1); border:1px solid var(--border);
+  font-weight:600; font-size:14px;
+}
+.led-dot{ width:16px; height:16px; border-radius:50%; background:#26314d; border:2px solid #5a6a94; transition:background .3s, box-shadow .3s; }
+.led-dot.weak{ background:rgba(251,227,138,0.55); border-color:rgba(251,227,138,0.7); box-shadow:0 0 8px rgba(251,227,138,0.5); }
+.led-dot.strong{ background:var(--yellow); border-color:#FFF3B0; box-shadow:0 0 16px var(--yellow); }
+
+.meter{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:5px; margin-top:12px; }
+.meter-seg{ height:9px; border-radius:999px; background:var(--panel-1); border:1px solid var(--border-soft); overflow:hidden; }
+.meter-fill{ height:100%; width:0; border-radius:999px; transition:width .4s ease; }
+.meter-seg:nth-child(1) .meter-fill{ background:var(--skyblue); }
+.meter-seg:nth-child(2) .meter-fill{ background:var(--amber); }
+.meter-seg:nth-child(3) .meter-fill{ background:var(--green); }
+.meter-labels{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:5px; margin-top:4px; font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); text-align:center; }
+.meter-labels .on{ color:var(--text); font-weight:600; }
+
+/* líquido animado */
+.liq-surface{ fill:none; stroke-width:2; stroke-linecap:round; opacity:0.75; }
+.liq-sheen{ opacity:0.07; }
+@media (prefers-reduced-motion: no-preference){
+  .liq-sheen{ animation:sheen 11s ease-in-out infinite alternate; }
+}
+@keyframes sheen{ from{ transform:translateX(-40px); } to{ transform:translateX(250px); } }
+
+/* explicação do resultado: cadeia visual + 3 linhas */
+.explain{ margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); }
+.explain-title{ font-weight:700; font-size:14.5px; margin-bottom:10px; }
+.chain{
+  display:flex; align-items:flex-start; gap:2px;
+  padding:10px 6px 8px; border-radius:12px;
+  background:var(--panel-1); border:1px solid var(--border-soft);
+}
+.cn{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:5px; text-align:center; }
+.cn-ico{
+  width:40px; height:32px; border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text-faint);
+  transition:border-color .25s, color .25s, opacity .25s;
+}
+.cn-cap{ font-family:var(--font-mono); font-size:10px; line-height:1.2; color:var(--text-faint); overflow-wrap:anywhere; }
+.cn.on .cn-ico{ border-color:rgba(79,209,197,0.65); color:var(--teal); }
+.cn.on .cn-cap{ color:var(--text); }
+.cn.weak .cn-ico{ border-color:rgba(242,166,90,0.65); color:var(--amber); }
+.cn.weak .cn-cap{ color:var(--amber); }
+.cn.idle .cn-ico{ color:var(--text-dim); }
+.cn.off .cn-ico{ border-style:dashed; opacity:0.75; }
+.cn-sep{ flex:0 0 9px; margin-top:9px; font-family:var(--font-mono); font-size:12px; color:var(--teal); text-align:center; }
+.cn-sep.weak{ color:var(--amber); }
+.cn-sep.idle, .cn-sep.off{ color:var(--border); }
+.ex-lines{ display:flex; flex-direction:column; gap:9px; margin-top:12px; }
+.ex-line{ display:grid; grid-template-columns:96px minmax(0,1fr); gap:10px; align-items:baseline; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+.ex-tag{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:0.4px; color:var(--teal);
+  padding:2px 6px; border-radius:6px; text-align:center;
+  background:rgba(79,209,197,0.08); border:1px solid rgba(79,209,197,0.25); white-space:nowrap;
+}
+.ex-line.warn .ex-tag{ color:var(--coral); background:rgba(240,112,138,0.08); border-color:rgba(240,112,138,0.3); }
+.ex-eq{ margin-top:10px; font-family:var(--font-mono); font-size:12px; color:var(--skyblue); overflow-wrap:anywhere; }
+@media (max-width:560px){
+  .ex-line{ grid-template-columns:minmax(0,1fr); gap:3px; }
+  .ex-tag{ justify-self:start; }
+  .cn-ico{ width:36px; height:30px; }
+  .cn-cap{ font-size:9.5px; }
+}
+.result-links{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+
+/* ===================== CONCEITOS ===================== */
+.concepts{ display:flex; flex-direction:column; gap:24px; }
+/* mini-circuitos: mesma geometria da bancada, em escala menor */
+.mini-lab{ position:relative; width:100%; aspect-ratio:340 / 366; }
+.mini-lab > svg{ position:absolute; inset:0; width:100%; height:100%; display:block; overflow:visible; }
+.mini-lab canvas{ position:absolute; left:4.706%; top:63.388%; width:90.588%; height:32.514%; display:block; pointer-events:none; }
+.mini-frame{ background:var(--panel-1); border:1px solid var(--border-soft); border-radius:14px; padding:8px 8px 6px; }
+
+.c-hero{ display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,0.8fr); gap:24px; align-items:center; }
+.c-hero h2{ font-size:clamp(24px, 4.4vw, 34px); line-height:1.2; }
+.c-hero .lead{ margin-top:10px; color:var(--text-dim); font-size:15.5px; line-height:1.6; max-width:52ch; }
+.c-hero .lead b{ color:var(--text); font-weight:600; }
+.hero-chain{ margin-top:16px; max-width:520px; }
+.hero-lab{ max-width:320px; width:100%; justify-self:center; }
+.hero-caption{ display:flex; flex-wrap:wrap; gap:6px 14px; justify-content:center; margin-top:8px; font-family:var(--font-mono); font-size:11.5px; color:var(--text-dim); }
+.hero-caption span{ display:inline-flex; align-items:center; gap:6px; }
+
+.c-section h2{ font-size:clamp(20px, 3.6vw, 26px); margin-bottom:12px; }
+.c-sub{ color:var(--text-dim); font-size:15px; line-height:1.6; max-width:66ch; margin:-4px 0 14px; }
+.c-sub b{ color:var(--text); font-weight:600; }
+.c-row3{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; }
+.e-card{ background:var(--panel-2); border:1px solid var(--border); border-top:3px solid; border-radius:var(--radius-lg); padding:14px; min-width:0; }
+.e-card .mini-frame{ width:100%; max-width:210px; margin:0 auto; }
+.e-card.strong{ border-top-color:var(--green); }
+.e-card.weak{ border-top-color:var(--amber); }
+.e-card.none{ border-top-color:var(--skyblue); }
+.e-body{ margin-top:10px; }
+.e-card h3{ font-size:18px; }
+.e-card .e-line{ color:var(--text-dim); font-size:14px; margin-top:2px; }
+.e-led{ display:inline-flex; align-items:center; gap:7px; margin-top:8px; font-family:var(--font-mono); font-size:12px; color:var(--text); }
+.e-examples{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.chip-btn{
+  font-family:var(--font-mono); font-size:11.5px; padding:6px 11px; min-height:34px; border-radius:999px;
+  background:var(--panel-3); border:1px solid var(--border); color:var(--text); cursor:pointer;
+  display:inline-flex; align-items:center; gap:6px; transition:border-color .15s;
+}
+.chip-btn:hover{ border-color:var(--teal); }
+.chip-btn .play{ color:var(--teal); font-size:10px; }
+
+/* concentração */
+.conc-card{ background:var(--panel-2); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; }
+.conc-layout{ display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr); gap:20px; align-items:center; }
+.conc-pair{ display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; }
+.conc-pair figure{ margin:0; }
+.conc-pair .mini-frame{ max-width:170px; margin:0 auto; }
+.conc-pair figcaption{ text-align:center; margin-top:6px; font-size:13px; color:var(--text-dim); display:flex; flex-direction:column; align-items:center; gap:3px; }
+.conc-pair figcaption b{ color:var(--text); font-size:14px; }
+.conc-pair figcaption > span{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; }
+.conc-arrow{ font-family:var(--font-mono); font-size:22px; color:var(--teal); }
+.cmp{ display:grid; gap:6px; }
+.cmp-row{
+  display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1fr); align-items:center; gap:10px;
+  padding:8px 10px; border-radius:10px; background:var(--panel-1); border:1px solid var(--border-soft);
+}
+.cmp-head{ background:none; border:none; padding:0 10px; font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); letter-spacing:0.4px; }
+.cmp-k{ display:flex; align-items:center; gap:8px; font-size:13.5px; line-height:1.3; }
+.pips{ display:flex; gap:3px; }
+.pips i{ width:11px; height:8px; border-radius:2px; background:var(--panel-3); border:1px solid var(--border); }
+.pips i.on{ background:var(--teal); border-color:var(--teal); }
+.pips.lo i.on{ background:var(--amber); border-color:var(--amber); }
+.conc-rule{ margin-top:14px; display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px 8px; font-weight:600; font-size:14.5px; }
+.conc-rule .arr{ color:var(--teal); font-family:var(--font-mono); }
+.sugar-note{
+  display:grid; grid-template-columns:118px minmax(0,1fr); gap:14px; align-items:center;
+  margin-top:16px; padding:12px; border-radius:14px;
+  background:rgba(242,166,90,0.06); border:1px solid rgba(242,166,90,0.3);
+}
+.sugar-note .mini-frame{ width:100%; padding:5px 5px 3px; }
+.sugar-note h3{ font-size:16.5px; color:var(--amber); }
+.sugar-note p{ color:var(--text-dim); font-size:14px; line-height:1.55; margin-top:4px; }
+.sugar-facts{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.sugar-facts > span{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:11px; padding:3px 9px; border-radius:999px; background:var(--panel-1); border:1px solid var(--border); color:var(--text-dim); }
+.cta-row{ display:flex; justify-content:center; padding:2px 0 8px; }
+.cta-row .btn{ min-height:50px; padding:12px 28px; font-size:15px; }
+
+/* ===================== QUIZ ===================== */
+.quiz-wrap{ max-width:760px; margin:0 auto; }
+.quiz-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-family:var(--font-mono); font-size:12.5px; color:var(--text-faint); margin-bottom:10px; }
+.quiz-top b{ color:var(--text); }
+.quiz-bar{ display:grid; grid-template-columns:repeat(10, minmax(0,1fr)); gap:4px; margin-bottom:20px; }
+.quiz-bar span{ height:6px; border-radius:999px; background:var(--panel-3); transition:background .25s; }
+.quiz-bar span.cur{ background:var(--teal); opacity:0.55; }
+.quiz-bar span.ok{ background:var(--green); }
+.quiz-bar span.bad{ background:var(--coral); }
+.quiz-q{ font-family:var(--font-display); font-size:clamp(19px, 3.6vw, 23px); line-height:1.35; margin-bottom:16px; font-weight:600; }
+.quiz-opts{ display:flex; flex-direction:column; gap:9px; }
+.quiz-opt{
+  display:flex; align-items:flex-start; gap:12px; width:100%; text-align:left;
+  background:var(--panel-1); border:1px solid var(--border); border-radius:12px;
+  padding:12px 14px; cursor:pointer; font-size:15px; line-height:1.45; color:var(--text);
+  transition:border-color .15s, background .15s, opacity .2s;
+}
+.quiz-opt:hover:not(:disabled){ border-color:var(--skyblue); background:var(--panel-3); }
+.quiz-opt:disabled{ cursor:default; }
+.opt-letter{
+  flex-shrink:0; width:27px; height:27px; border-radius:8px; margin-top:-1px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:12.5px; font-weight:600;
+  background:var(--panel-3); border:1px solid var(--border); color:var(--skyblue);
+}
+.quiz-opt.correct{ border-color:var(--green); background:rgba(111,207,151,0.12); }
+.quiz-opt.correct .opt-letter{ background:var(--green); border-color:var(--green); color:#0B1220; }
+.quiz-opt.wrong{ border-color:var(--coral); background:rgba(240,112,138,0.12); }
+.quiz-opt.wrong .opt-letter{ background:var(--coral); border-color:var(--coral); color:#0B1220; }
+.quiz-opt.faded{ opacity:0.5; }
+.quiz-feedback{ margin-top:14px; padding:13px 15px; border-radius:12px; border:1px solid; }
+.quiz-feedback[hidden]{ display:none; }
+.quiz-feedback.ok{ background:rgba(111,207,151,0.1); border-color:rgba(111,207,151,0.45); }
+.quiz-feedback.bad{ background:rgba(240,112,138,0.1); border-color:rgba(240,112,138,0.45); }
+.fb-title{ font-weight:700; font-size:15px; }
+.quiz-feedback.ok .fb-title{ color:var(--green); }
+.quiz-feedback.bad .fb-title{ color:var(--coral); }
+.fb-text{ font-size:14px; color:var(--text-dim); margin-top:4px; line-height:1.55; }
+.quiz-actions{ display:flex; justify-content:flex-end; margin-top:16px; }
+.quiz-final{ text-align:center; padding:8px 4px 4px; }
+.quiz-final[hidden]{ display:none; }
+.qf-eyebrow{ font-family:var(--font-mono); font-size:12px; color:var(--teal); letter-spacing:1px; }
+.score-ring{ width:140px; height:140px; margin:14px auto 6px; display:block; }
+.score-ring .ring-bg{ fill:none; stroke:var(--panel-3); stroke-width:10; }
+.score-ring .ring-fg{ fill:none; stroke-width:10; stroke-linecap:round; transform:rotate(-90deg); transform-origin:70px 70px; transition:stroke-dashoffset .8s ease; }
+.score-ring .ring-num{ font-family:var(--font-display); font-size:34px; font-weight:700; fill:var(--text); }
+.score-ring .ring-den{ font-family:var(--font-mono); font-size:13px; fill:var(--text-faint); }
+.qf-score{ font-size:17px; font-weight:600; }
+.qf-msg{ color:var(--text-dim); max-width:46ch; margin:8px auto 0; font-size:15px; line-height:1.55; }
+.qf-actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+.review{ margin-top:20px; text-align:left; }
+.review summary{ cursor:pointer; font-weight:600; font-size:14px; padding:10px 12px; border-radius:10px; background:var(--panel-1); border:1px solid var(--border); }
+.review-list{ display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.review-item{ background:var(--panel-1); border:1px solid var(--border-soft); border-radius:10px; padding:10px 12px; font-size:13.5px; color:var(--text-dim); line-height:1.5; }
+.review-item b{ color:var(--text); display:block; margin-bottom:3px; font-weight:600; }
+.review-item .ans{ color:var(--green); }
+
+/* quiz: transições, feedback e ilustrações laterais */
+.quiz-layout{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,760px) minmax(0,1fr); gap:28px; align-items:start; }
+.quiz-layout .quiz-wrap{ width:100%; }
+.quiz-deco{ position:sticky; top:120px; display:flex; justify-content:center; opacity:0.72; pointer-events:none; }
+.quiz-deco svg{ width:100%; max-width:160px; height:auto; display:block; }
+.deco-wire{ fill:none; stroke:var(--teal); stroke-opacity:0.55; stroke-width:2; stroke-dasharray:6 6; stroke-linecap:round; }
+@media (prefers-reduced-motion: no-preference){ .deco-wire{ animation:dashmove 1.8s linear infinite; } }
+@media (max-width:1080px){
+  .quiz-layout{ grid-template-columns:minmax(0,1fr); }
+  .quiz-deco{ display:none; }
+}
+.opt-text{ flex:1; min-width:0; }
+.opt-tag{
+  display:block; width:fit-content; margin-top:6px;
+  font-family:var(--font-mono); font-size:10.5px; color:var(--green);
+  padding:2px 8px; border-radius:999px; border:1px solid rgba(111,207,151,0.5); background:rgba(111,207,151,0.08);
+}
+.quiz-opt.correct{ box-shadow:0 0 0 3px rgba(111,207,151,0.16); }
+.fb-title{ display:flex; align-items:center; gap:9px; }
+.fb-ico{ width:24px; height:24px; border-radius:50%; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#0B1220; }
+.quiz-feedback.ok .fb-ico{ background:var(--green); }
+.quiz-feedback.bad .fb-ico{ background:var(--coral); }
+@media (prefers-reduced-motion: no-preference){
+  .quiz-opt.pop{ animation:optPop .38s ease; }
+  .quiz-opt.shake{ animation:optShake .4s ease; }
+  .quiz-opt.reveal{ animation:optReveal 1s ease; }
+  .quiz-feedback:not([hidden]){ animation:fbIn .3s ease; }
+  .quiz-feedback.ok .fb-ico{ animation:icoPop .45s cubic-bezier(.2,1.6,.4,1); }
+  .quiz-feedback.bad .fb-ico{ animation:icoPop .35s ease; }
+  .bump{ display:inline-block; animation:bump .4s ease; }
+  .quiz-bar span.just{ transform-origin:left center; animation:segFill .4s ease; }
+}
+@keyframes optPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.025); } 100%{ transform:scale(1); } }
+@keyframes optShake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-7px); } 40%{ transform:translateX(6px); } 60%{ transform:translateX(-4px); } 80%{ transform:translateX(2px); } }
+@keyframes optReveal{ 0%{ box-shadow:0 0 0 0 rgba(111,207,151,0.55); } 100%{ box-shadow:0 0 0 12px rgba(111,207,151,0); } }
+@keyframes fbIn{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+@keyframes icoPop{ from{ transform:scale(0); } to{ transform:scale(1); } }
+@keyframes bump{ 50%{ transform:scale(1.4); color:var(--green); } }
+@keyframes segFill{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+
+/* ===================== COMO USAR ===================== */
+.modal-overlay{ position:fixed; inset:0; background:rgba(6,10,20,0.75); display:none; align-items:center; justify-content:center; z-index:1000; padding:16px; }
+.modal-overlay.show{ display:flex; }
+.modal-box{ background:var(--panel-2); border:1px solid var(--border); border-radius:var(--radius-lg); max-width:520px; width:100%; max-height:88vh; overflow-y:auto; padding:24px 22px; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+.modal-close{ position:absolute; top:12px; right:12px; width:36px; height:36px; border-radius:50%; background:var(--panel-1); border:1px solid var(--border); color:var(--text-dim); cursor:pointer; font-size:18px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.modal-close:hover{ border-color:var(--coral); color:var(--coral); }
+.modal-title{ font-family:var(--font-display); font-size:23px; font-weight:600; margin-bottom:14px; padding-right:40px; }
+.howto-steps{ display:flex; flex-direction:column; gap:9px; }
+.howto-step{ display:flex; gap:10px; align-items:flex-start; font-size:14px; color:var(--text-dim); line-height:1.5; }
+.howto-step .step-n{ margin-top:1px; }
+.howto-step b{ color:var(--text); font-weight:600; }
+.howto-areas{ display:grid; gap:6px; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-soft); }
+.howto-area{ display:flex; gap:10px; align-items:baseline; font-size:14px; color:var(--text-dim); }
+.howto-area b{ font-family:var(--font-mono); font-size:12px; color:var(--teal); min-width:104px; letter-spacing:0.5px; }
+.howto-footer{ margin-top:20px; display:flex; justify-content:center; }
+
+/* ===================== RESPONSIVO ===================== */
+@media (max-width:860px){
+  .c-hero{ grid-template-columns:minmax(0,1fr); }
+  .hero-lab{ max-width:260px; }
+  .c-row3{ grid-template-columns:minmax(0,1fr); }
+  .conc-layout{ grid-template-columns:minmax(0,1fr); }
+  .e-card{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; align-items:center; }
+  .e-body{ margin-top:0; }
+}
+@media (max-width:560px){
+  .app-shell{ padding:0 12px 48px; }
+  .site-header{ padding:16px 0 12px; }
+  .hero-fact{ font-size:11px; }
+  .nav-bar{ margin:0 -12px 16px; padding:8px 12px; gap:8px; }
+  .area-nav button{ padding:8px 2px 7px; }
+  .nav-label{ font-size:13px; letter-spacing:0; text-transform:none; }
+  .nav-sub{ font-size:9.5px; }
+  .howto-btn{ width:44px; padding:0; }
+  .howto-btn .howto-text{ display:none; }
+  .panel{ padding:14px; }
+  .sample-name{ font-size:18px; }
+  .flask-name{ font-size:12.5px; }
+  .result-level{ font-size:30px; }
+  .e-card{ padding:12px; gap:10px; }
+  .e-card h3{ font-size:16.5px; }
+  .e-card .e-line{ font-size:13px; }
+  .conc-pair{ grid-template-columns:1fr 1fr; }
+  .conc-arrow{ display:none; }
+  .cmp-row{ grid-template-columns:minmax(0,1.3fr) minmax(0,0.85fr) minmax(0,0.85fr); gap:6px; padding:8px; }
+  .cmp-k{ font-size:12.5px; gap:6px; }
+  .pips i{ width:8px; height:7px; }
+  .sugar-note{ grid-template-columns:92px minmax(0,1fr); gap:10px; }
+  .c-sub{ font-size:14.5px; }
+  .quiz-actions .btn{ width:100%; }
+  .modal-box{ padding:20px 16px; }
+  .howto-area{ flex-direction:column; gap:0; }
+}
+@media (max-width:360px){
+  .nav-label{ font-size:12px; }
+  .howto-btn{ width:40px; min-height:40px; }
+  .e-card{ grid-template-columns:minmax(0,1fr); }
+  .sugar-note{ grid-template-columns:minmax(0,1fr); }
+  .sugar-note .mini-frame{ max-width:130px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .view.active{ animation:none; }
+  *{ transition-duration:0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- gradiente do brilho do LED (compartilhado por todos os circuitos) -->
+<svg class="svg-defs" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="ledGlowGrad">
+      <stop offset="0" stop-color="#FFF8D6" stop-opacity="1"/>
+      <stop offset="0.35" stop-color="#FBE38A" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#FBE38A" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sheenGradG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rodGradG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8b95a8"/>
+      <stop offset="0.4" stop-color="#d6dce8"/>
+      <stop offset="1" stop-color="#8b95a8"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="app-shell">
+
+  <header class="site-header">
+    <div class="eyebrow">-- LABORATÓRIO DE QUÍMICA</div>
+    <h1 class="hero-title">Condutividade elétrica de soluções</h1>
+    <div class="hero-fact">ÍONS MÓVEIS → CORRENTE ELÉTRICA → LED</div>
+  </header>
+
+  <div class="nav-bar">
+    <nav class="area-nav" id="area-nav" aria-label="Áreas do simulador">
+      <button type="button" data-view="concepts" class="active" aria-current="page"><span class="nav-label">Conceitos</span><span class="nav-sub">entender</span></button>
+      <button type="button" data-view="lab"><span class="nav-label">Laboratório</span><span class="nav-sub">experimentar</span></button>
+      <button type="button" data-view="quiz"><span class="nav-label">Quiz</span><span class="nav-sub">testar</span></button>
+    </nav>
+    <button class="howto-btn" id="howto-open-btn" type="button" aria-haspopup="dialog" aria-label="Como usar"><span class="icon" aria-hidden="true">?</span><span class="howto-text">Como usar</span></button>
+  </div>
+
+  <!-- ===================================================== CONCEITOS -->
+  <section class="view active" id="view-concepts" aria-label="Conceitos">
+    <div class="concepts">
+
+      <div class="c-hero">
+        <div>
+          <h2>O que faz o LED acender?</h2>
+          <p class="lead">Quando certas substâncias se dissolvem na água, elas formam <b>íons</b>: partículas com carga elétrica, positiva (+) ou negativa (−), livres para se mover pela solução.</p>
+          <p class="lead">Com o circuito fechado, os íons se movem até os eletrodos. Esse <b>movimento de cargas é a corrente elétrica</b> que atravessa a solução e acende o LED.</p>
+          <div class="chain hero-chain" id="hero-chain" aria-hidden="true"></div>
+        </div>
+        <div class="hero-lab">
+          <div class="mini-frame"><div class="mini-lab" data-mini="hero"></div></div>
+          <div class="hero-caption">
+            <span><i class="lg-ion" style="background:#4FD1C5">+</i>vai para o eletrodo <b class="pole-minus">−</b></span>
+            <span><i class="lg-ion" style="background:#C9A6F5">−</i>vai para o eletrodo <b class="pole-plus">+</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="c-section">
+        <h2>Conduz bem, pouco ou nada?</h2>
+        <div class="c-row3">
+          <article class="e-card strong">
+            <div class="mini-frame"><div class="mini-lab" data-mini="strong"></div></div>
+            <div class="e-body">
+              <h3>Conduz bem</h3>
+              <p class="e-line">Eletrólito forte: muitos íons.</p>
+              <div class="e-led"><span class="led-dot strong"></span>LED aceso</div>
+              <div class="e-examples">
+                <button class="chip-btn" type="button" data-test-sol="sal"><span class="play" aria-hidden="true">▶</span>Água com sal</button>
+                <button class="chip-btn" type="button" data-test-sol="kbr"><span class="play" aria-hidden="true">▶</span>KBr</button>
+              </div>
+            </div>
+          </article>
+          <article class="e-card weak">
+            <div class="mini-frame"><div class="mini-lab" data-mini="weak"></div></div>
+            <div class="e-body">
+              <h3>Conduz pouco</h3>
+              <p class="e-line">Eletrólito fraco: poucos íons, muitas moléculas.</p>
+              <div class="e-led"><span class="led-dot weak"></span>LED fraco</div>
+              <div class="e-examples">
+                <button class="chip-btn" type="button" data-test-sol="vinagre"><span class="play" aria-hidden="true">▶</span>Vinagre</button>
+                <button class="chip-btn" type="button" data-test-sol="amonia"><span class="play" aria-hidden="true">▶</span>Amônia</button>
+              </div>
+            </div>
+          </article>
+          <article class="e-card none">
+            <div class="mini-frame"><div class="mini-lab" data-mini="none"></div></div>
+            <div class="e-body">
+              <h3>Não conduz</h3>
+              <p class="e-line">Não eletrólito: só moléculas, sem íons.</p>
+              <div class="e-led"><span class="led-dot"></span>LED apagado</div>
+              <div class="e-examples">
+                <button class="chip-btn" type="button" data-test-sol="acucar"><span class="play" aria-hidden="true">▶</span>Água com açúcar</button>
+                <button class="chip-btn" type="button" data-test-sol="destilada"><span class="play" aria-hidden="true">▶</span>Água destilada</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="c-section">
+        <h2>E a concentração?</h2>
+        <p class="c-sub"><b>Concentração</b> é a quantidade de soluto dissolvida em um certo volume de solução. Num eletrólito, como a água com sal, cada porção de soluto dissolvida libera íons. Veja o que muda quando a concentração aumenta:</p>
+        <div class="conc-card">
+          <div class="conc-layout">
+            <div class="conc-pair">
+              <figure>
+                <div class="mini-frame"><div class="mini-lab" data-mini="dilute"></div></div>
+                <figcaption><b>Diluída</b><span><span class="led-dot weak"></span>LED fraco</span></figcaption>
+              </figure>
+              <span class="conc-arrow" aria-hidden="true">→</span>
+              <figure>
+                <div class="mini-frame"><div class="mini-lab" data-mini="conc"></div></div>
+                <figcaption><b>Concentrada</b><span><span class="led-dot strong"></span>LED aceso</span></figcaption>
+              </figure>
+            </div>
+            <div class="cmp" role="table" aria-label="Comparação entre solução diluída e concentrada">
+              <div class="cmp-row cmp-head" role="row"><span role="columnheader">O QUE MUDA</span><span role="columnheader">DILUÍDA</span><span role="columnheader">CONCENTRADA</span></div>
+              <div class="cmp-row" role="row"><span class="cmp-k" role="cell"><span class="step-n">1</span>Soluto no mesmo volume</span><span class="pips lo" role="cell" aria-label="pouco"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="pips" role="cell" aria-label="muito"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+              <div class="cmp-row" role="row"><span class="cmp-k" role="cell"><span class="step-n">2</span>Íons livres na solução</span><span class="pips lo" role="cell" aria-label="poucos"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="pips" role="cell" aria-label="muitos"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+              <div class="cmp-row" role="row"><span class="cmp-k" role="cell"><span class="step-n">3</span>Cargas em movimento</span><span class="pips lo" role="cell" aria-label="poucas"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="pips" role="cell" aria-label="muitas"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+              <div class="cmp-row" role="row"><span class="cmp-k" role="cell"><span class="step-n">4</span>Corrente e brilho do LED</span><span class="pips lo" role="cell" aria-label="fraca"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="pips" role="cell" aria-label="forte"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></div>
+            </div>
+          </div>
+          <div class="conc-rule"><span>Mais soluto</span><span class="arr">→</span><span>mais íons</span><span class="arr">→</span><span>mais cargas se movendo</span><span class="arr">→</span><span>LED mais forte</span></div>
+
+          <div class="sugar-note">
+            <div class="mini-frame"><div class="mini-lab" data-mini="sugarMore"></div></div>
+            <div>
+              <h3>A concentração não cria íons</h3>
+              <p>Mais açúcar no mesmo volume significa mais moléculas, mas todas continuam sem carga elétrica. Sem íons, não há cargas para levar a corrente, e o LED segue apagado em qualquer concentração.</p>
+              <div class="sugar-facts"><span>moléculas: mais</span><span>íons: nenhum</span><span><span class="led-dot"></span>LED apagado</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row"><button class="btn btn-primary" type="button" data-goto="lab">Ir para o laboratório</button></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== LABORATÓRIO -->
+  <section class="view" id="view-lab" aria-label="Laboratório">
+    <div class="lab-grid">
+
+      <div class="panel lab-bench">
+        <div class="panel-title"><span class="step-n">2</span>COLOQUE OS ELETRODOS E OBSERVE O LED</div>
+        <div class="bench-head">
+          <div class="sample-line">
+            <span class="sample-swatch" id="bench-swatch"></span>
+            <span class="sample-name" id="bench-sol-name">—</span>
+            <span class="type-chip" id="bench-type-chip">—</span>
+          </div>
+          <span class="circuit-chip open" id="circuit-chip">Circuito aberto</span>
+        </div>
+
+        <div class="bench-stage">
+          <div class="bench-inner" id="bench-inner">
+            <!-- circuito: bateria → eletrodo A → solução → eletrodo B → LED → bateria -->
+            <svg viewBox="120 0 360 420" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <defs>
+                <linearGradient id="liqGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" id="liq-stop-top" stop-color="#6FCF97" stop-opacity="0.36"/>
+                  <stop offset="1" id="liq-stop-bot" stop-color="#6FCF97" stop-opacity="0.14"/>
+                </linearGradient>
+                <linearGradient id="sheenGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+                  <stop offset="0.5" stop-color="#ffffff" stop-opacity="1"/>
+                  <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+                </linearGradient>
+                <clipPath id="liqClip"><path id="liq-clip-path" d="M146,258 L454,258 L454,384 L146,384 Z"/></clipPath>
+              </defs>
+
+              <!-- circuito: bateria → eletrodo A → solução → eletrodo B → LED → bateria -->
+              <path class="wire" d="M207,128 L190,128 L190,196"/>
+              <path class="wire" d="M318,128 L350,128"/>
+              <path class="wire" d="M370,128 L410,128 L410,196"/>
+
+              <!-- bateria -->
+              <rect class="battery-nub" x="207" y="119" width="8" height="18" rx="2"/>
+              <rect class="battery-body" x="214" y="106" width="104" height="44" rx="7"/>
+              <text class="sign-plus" x="233" y="136" font-size="22" text-anchor="middle">+</text>
+              <text class="sign-minus" x="299" y="136" font-size="22" text-anchor="middle">−</text>
+              <text class="svg-label" x="266" y="96" text-anchor="middle">BATERIA</text>
+
+              <!-- LED (destaque) -->
+              <g class="led-glow-g" id="led-glow-g"><circle class="led-glow" id="led-glow" cx="360" cy="86" r="30" fill="url(#ledGlowGrad)"/></g>
+              <path class="led-leg" d="M350,128 V108 M370,128 V108"/>
+              <rect class="led-rim" x="338" y="104" width="44" height="7" rx="2"/>
+              <path class="led-dome" id="led-dome" d="M342,104 V82 A18,18 0 0 1 378,82 V104 Z"/>
+              <ellipse class="led-hl" id="led-hl" cx="352" cy="86" rx="3.5" ry="9"/>
+              <text class="led-state" id="led-state" x="362" y="174" text-anchor="middle" font-size="14">LED APAGADO</text>
+
+              <!-- béquer com a solução (superfície animada) -->
+              <path class="beaker-liquid" id="liquid-path" fill="url(#liqGrad)" d="M146,258 L454,258 L454,378 Q454,384 448,384 L152,384 Q146,384 146,378 Z"/>
+              <g clip-path="url(#liqClip)"><rect class="liq-sheen" x="146" y="250" width="70" height="140" fill="url(#sheenGrad)"/></g>
+              <path class="liq-surface" id="liquid-surface" d="M146,258 L454,258"/>
+              <path class="beaker-glass" d="M136,232 L142,237 L142,378 Q142,388 152,388 L448,388 Q458,388 458,378 L458,237 L464,232"/>
+              <line class="beaker-tick" x1="142" y1="300" x2="152" y2="300"/>
+              <line class="beaker-tick" x1="142" y1="330" x2="152" y2="330"/>
+              <line class="beaker-tick" x1="142" y1="360" x2="152" y2="360"/>
+              <text class="svg-label" x="300" y="410" text-anchor="middle">SOLUÇÃO</text>
+            </svg>
+
+            <div class="particles-wrap" id="particles-wrap"><canvas id="particles-canvas"></canvas></div>
+
+            <div class="electrode-rod" data-electrode="A" tabindex="0" role="button" aria-pressed="false" aria-label="Eletrodo A, polo positivo. Toque para colocar ou retirar da solução.">
+              <span class="electrode-tag">A <span class="pole-plus">+</span></span>
+              <span class="rod-cap"></span><span class="rod-tip"></span><span class="rod-hint"></span>
+            </div>
+            <div class="electrode-rod" data-electrode="B" tabindex="0" role="button" aria-pressed="false" aria-label="Eletrodo B, polo negativo. Toque para colocar ou retirar da solução.">
+              <span class="electrode-tag">B <span class="pole-minus">−</span></span>
+              <span class="rod-cap"></span><span class="rod-tip"></span><span class="rod-hint"></span>
+            </div>
+          </div>
+        </div>
+
+        <button class="act-btn" type="button" id="btn-electrodes"><span class="arrow" aria-hidden="true">↓</span><span id="btn-electrodes-text">Colocar os eletrodos na solução</span></button>
+
+        <div class="conc-block" id="conc-block">
+          <div class="conc-head">
+            <label class="conc-title" for="conc-range"><span class="drag-ico" aria-hidden="true">⇆</span>Concentração</label>
+            <span class="conc-pill" id="conc-val">50<small>/100</small></span>
+          </div>
+          <input type="range" class="conc-range" id="conc-range" min="10" max="100" step="1" value="50" aria-describedby="conc-scale">
+          <div class="conc-scale" id="conc-scale"><span>diluída</span><span>escala relativa</span><span>concentrada</span></div>
+        </div>
+        <p class="conc-fixed" id="conc-fixed" hidden></p>
+
+        <div class="ion-legend" id="ion-legend"></div>
+        <p class="particle-behavior" id="particle-behavior"></p>
+      </div>
+
+      <div class="lab-side">
+        <div class="panel card-picker">
+          <div class="panel-title"><span class="step-n">1</span>ESCOLHA A SOLUÇÃO</div>
+          <div class="flask-grid" id="flask-grid"></div>
+        </div>
+
+        <div class="panel card-result" aria-live="polite">
+          <div class="panel-title"><span class="step-n">3</span>RESULTADO</div>
+          <div class="result-top">
+            <div>
+              <div class="result-k">CONDUTIVIDADE</div>
+              <div class="result-level lvl-wait" id="res-level">—</div>
+            </div>
+            <div class="led-pill"><span class="led-dot" id="res-led-dot"></span><span id="res-led">LED apagado</span></div>
+          </div>
+          <div class="meter" aria-hidden="true">
+            <div class="meter-seg"><div class="meter-fill" id="mf-0"></div></div>
+            <div class="meter-seg"><div class="meter-fill" id="mf-1"></div></div>
+            <div class="meter-seg"><div class="meter-fill" id="mf-2"></div></div>
+          </div>
+          <div class="meter-labels" aria-hidden="true"><span>baixa</span><span>média</span><span>alta</span></div>
+          <div class="explain">
+            <div class="explain-title" id="ex-title">Por que o LED está apagado?</div>
+            <div class="chain" id="ex-chain" aria-hidden="true"></div>
+            <div class="ex-lines" id="ex-lines"></div>
+            <div class="ex-eq" id="ex-eq" hidden></div>
+          </div>
+          <div class="result-links">
+            <button class="btn btn-ghost btn-sm" type="button" data-goto="concepts">Rever conceitos</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-goto="quiz">Fazer o quiz</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================================================== QUIZ -->
+  <section class="view" id="view-quiz" aria-label="Quiz">
+    <div class="quiz-layout">
+      <aside class="quiz-deco" aria-hidden="true">
+        <svg class="deco-svg" viewBox="0 0 160 340">
+          <circle cx="80" cy="44" r="34" fill="url(#ledGlowGrad)" opacity="0.3"><animate attributeName="opacity" values="0.18;0.42;0.18" dur="4.5s" repeatCount="indefinite"/></circle>
+          <path d="M72,72 V58 M88,72 V58" stroke="#8b95a8" stroke-width="2"/>
+          <rect x="65" y="54" width="30" height="5" rx="1.5" fill="#3a4870"/>
+          <path d="M69,54 V41 A11,11 0 0 1 91,41 V54 Z" fill="#FBE38A" fill-opacity="0.6" stroke="#FFF3B0" stroke-width="1.2"/>
+          <path class="deco-wire" d="M72,72 V82 H44 V128"/>
+          <path class="deco-wire" d="M88,72 V82 H116 V128"/>
+          <path fill="rgba(79,209,197,0.13)" d="M26,170 C46,166 62,174 80,170 C98,166 114,174 134,170 L134,278 Q134,284 128,284 L32,284 Q26,284 26,278 Z">
+            <animate attributeName="d" dur="5s" repeatCount="indefinite"
+              values="M26,170 C46,166 62,174 80,170 C98,166 114,174 134,170 L134,278 Q134,284 128,284 L32,284 Q26,284 26,278 Z;
+                      M26,170 C46,174 62,166 80,170 C98,174 114,166 134,170 L134,278 Q134,284 128,284 L32,284 Q26,284 26,278 Z;
+                      M26,170 C46,166 62,174 80,170 C98,166 114,174 134,170 L134,278 Q134,284 128,284 L32,284 Q26,284 26,278 Z"/>
+          </path>
+          <path d="M20,154 L24,158 L24,280 Q24,290 34,290 L126,290 Q136,290 136,280 L136,158 L140,154" fill="none" stroke="#4a5f92" stroke-width="1.6" stroke-linejoin="round"/>
+          <rect x="41" y="128" width="6" height="134" rx="2" fill="url(#rodGradG)"/>
+          <rect x="113" y="128" width="6" height="134" rx="2" fill="url(#rodGradG)"/>
+          <text x="34" y="146" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#F2A65A">+</text>
+          <text x="122" y="146" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="600" fill="#7DD3FC">−</text>
+          <g><circle cx="60" cy="200" r="7" fill="#4FD1C5"/><path d="M56.5,200 h7 M60,196.5 v7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;40 2" dur="6s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="6s" repeatCount="indefinite"/></g>
+          <g><circle cx="100" cy="226" r="7" fill="#C9A6F5"/><path d="M96.5,226 h7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;-40 -2" dur="7s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="7s" repeatCount="indefinite"/></g>
+          <g><circle cx="62" cy="254" r="7" fill="#4FD1C5"/><path d="M58.5,254 h7 M62,250.5 v7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;36 -3" dur="7.5s" begin="-3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="7.5s" begin="-3s" repeatCount="indefinite"/></g>
+          <g><circle cx="98" cy="192" r="7" fill="#C9A6F5"/><path d="M94.5,192 h7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;-36 3" dur="6.5s" begin="-2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.85;1" dur="6.5s" begin="-2s" repeatCount="indefinite"/></g>
+        </svg>
+      </aside>
+    <div class="quiz-wrap">
+      <div class="panel">
+        <div id="quiz-question">
+          <div class="quiz-top">
+            <span>Questão <b id="qz-num">1</b> de <b>10</b></span>
+            <span>Acertos: <b id="qz-score">0</b></span>
+          </div>
+          <div class="quiz-bar" id="qz-bar" aria-hidden="true"></div>
+          <div id="qz-stage">
+            <h2 class="quiz-q" id="qz-q"></h2>
+            <div class="quiz-opts" id="qz-opts" role="group" aria-label="Alternativas"></div>
+            <div class="quiz-feedback" id="qz-feedback" hidden aria-live="polite">
+              <div class="fb-title"><span class="fb-ico" id="qz-fb-ico" aria-hidden="true"></span><span id="qz-fb-title"></span></div>
+              <p class="fb-text" id="qz-fb-text"></p>
+            </div>
+          </div>
+          <div class="quiz-actions"><button class="btn btn-primary" type="button" id="qz-next" disabled>Próxima pergunta</button></div>
+        </div>
+
+        <div class="quiz-final" id="quiz-final" hidden>
+          <div class="qf-eyebrow">QUIZ CONCLUÍDO</div>
+          <svg class="score-ring" viewBox="0 0 140 140" aria-hidden="true">
+            <circle class="ring-bg" cx="70" cy="70" r="56"/>
+            <circle class="ring-fg" id="qf-ring" cx="70" cy="70" r="56"/>
+            <text class="ring-num" id="qf-ring-num" x="70" y="78" text-anchor="middle">0</text>
+            <text class="ring-den" x="70" y="98" text-anchor="middle">de 10</text>
+          </svg>
+          <div class="qf-score" id="qf-score">Acertos: 0/10</div>
+          <p class="qf-msg" id="qf-msg"></p>
+          <div class="qf-actions">
+            <button class="btn btn-primary" type="button" id="qf-restart">Refazer quiz</button>
+            <button class="btn btn-ghost" type="button" data-goto="lab">Voltar ao laboratório</button>
+          </div>
+          <details class="review" id="qf-review" hidden>
+            <summary id="qf-review-sum">Ver as questões que você errou</summary>
+            <div class="review-list" id="qf-review-list"></div>
+          </details>
+        </div>
+      </div>
+    </div>
+      <aside class="quiz-deco" aria-hidden="true">
+        <svg class="deco-svg" viewBox="0 0 160 340">
+          <rect x="44" y="26" width="72" height="30" rx="6" fill="#1D2A4D" stroke="#4a5f92" stroke-width="1.6"/>
+          <rect x="38" y="35" width="6" height="12" rx="1.5" fill="#4a5f92"/>
+          <text x="58" y="47" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" fill="#F2A65A" text-anchor="middle">+</text>
+          <text x="102" y="47" font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" fill="#7DD3FC" text-anchor="middle">−</text>
+          <path class="deco-wire" d="M80,64 V118"/>
+          <path d="M84,92 l-9,13 h7 l-2,10 l10,-14 h-7 z" fill="#4FD1C5" fill-opacity="0.6"/>
+          <g><circle cx="44" cy="160" r="7" fill="#4FD1C5"/><path d="M40.5,160 h7 M44,156.5 v7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -7;0 0" dur="5s" repeatCount="indefinite"/></g>
+          <g><circle cx="106" cy="178" r="7" fill="#C9A6F5"/><path d="M102.5,178 h7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 6;0 0" dur="6s" repeatCount="indefinite"/></g>
+          <g><circle cx="74" cy="212" r="7" fill="rgba(242,166,90,0.15)" stroke="#F2A65A" stroke-width="1.5"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;4 -5;0 0" dur="7s" repeatCount="indefinite"/></g>
+          <g><circle cx="120" cy="236" r="7" fill="#4FD1C5"/><path d="M116.5,236 h7 M120,232.5 v7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;-4 6;0 0" dur="5.5s" repeatCount="indefinite"/></g>
+          <g><circle cx="40" cy="262" r="7" fill="rgba(251,227,138,0.15)" stroke="#FBE38A" stroke-width="1.5"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;5 4;0 0" dur="6.5s" repeatCount="indefinite"/></g>
+          <g><circle cx="90" cy="290" r="7" fill="#C9A6F5"/><path d="M86.5,290 h7" stroke="#0B1220" stroke-width="2" stroke-linecap="round"/>
+            <animateTransform attributeName="transform" type="translate" values="0 0;0 -6;0 0" dur="6s" repeatCount="indefinite"/></g>
+          <path d="M24,316 q8,-6 16,0 t16,0 t16,0 t16,0 t16,0 t16,0 t16,0" fill="none" stroke="#4a5f92" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </aside>
+    </div>
+  </section>
+
+</div>
+
+<!-- ===================================================== COMO USAR -->
+<div class="modal-overlay" id="howto-overlay">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="howto-title">
+    <button class="modal-close" id="howto-close-btn" type="button" aria-label="Fechar">×</button>
+    <div class="modal-title" id="howto-title">Como usar</div>
+    <div class="howto-steps">
+      <div class="howto-step"><span class="step-n">1</span><span><b>Escolha uma solução.</b></span></div>
+      <div class="howto-step"><span class="step-n">2</span><span><b>Coloque os dois eletrodos na solução:</b> toque neles, arraste para baixo ou use o botão. Isso fecha o circuito.</span></div>
+      <div class="howto-step"><span class="step-n">3</span><span><b>Observe o LED:</b> aceso, fraco ou apagado.</span></div>
+      <div class="howto-step"><span class="step-n">4</span><span><b>Observe as partículas:</b> íons (+ e −) e moléculas neutras.</span></div>
+      <div class="howto-step"><span class="step-n">5</span><span><b>Mude a concentração</b> e compare o brilho do LED.</span></div>
+    </div>
+    <div class="howto-areas">
+      <div class="howto-area"><b>CONCEITOS</b><span>entender a ideia.</span></div>
+      <div class="howto-area"><b>LABORATÓRIO</b><span>experimentar.</span></div>
+      <div class="howto-area"><b>QUIZ</b><span>testar o que aprendeu.</span></div>
+    </div>
+    <div class="howto-footer"><button class="btn btn-primary" id="howto-start-btn" type="button">Entendi</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ======================================================================
+   DADOS DAS SOLUÇÕES
+   ====================================================================== */
+const ION_COLOR = { cation:'#4FD1C5', anion:'#C9A6F5' };
+
+const SOLUTIONS = [
+  { id:'destilada', name:'Água destilada', short:'Água', flaskColor:'#7DD3FC', liquidColor:'rgba(125,211,252,0.20)',
+    type:'non-electrolyte', chip:'Quase sem íons', chipClass:'none',
+    concentrationAdjustable:false, baseConcentration:100,
+    neutral:{ label:'H₂O', color:'#7DD3FC' },
+    fixedNote:'Sem soluto dissolvido: não há concentração para ajustar.',
+    inWater:'A água destilada não tem nada dissolvido, e a própria água forma pouquíssimos íons.' },
+  { id:'sal', name:'Água com sal', short:'NaCl', flaskColor:'#6FCF97', liquidColor:'rgba(111,207,151,0.20)',
+    type:'strong-electrolyte', chip:'Eletrólito forte', chipClass:'strong',
+    concentrationAdjustable:true, baseConcentration:55,
+    cation:{ label:'Na⁺' }, anion:{ label:'Cl⁻' }, equation:'NaCl → Na⁺ + Cl⁻',
+    inWater:'O sal (NaCl) se separa em íons Na⁺ e Cl⁻ ao se dissolver na água.' },
+  { id:'acucar', name:'Água com açúcar', short:'Açúcar', flaskColor:'#FBE38A', liquidColor:'rgba(251,227,138,0.20)',
+    type:'non-electrolyte', chip:'Não eletrólito', chipClass:'none',
+    concentrationAdjustable:false, baseConcentration:100,
+    neutral:{ label:'C₁₂H₂₂O₁₁', color:'#FBE38A' },
+    fixedNote:'Concentração fixa: mais açúcar não forma íons.',
+    inWater:'O açúcar se dissolve, mas suas moléculas continuam inteiras e eletricamente neutras.' },
+  { id:'vinagre', name:'Vinagre', short:'Ác. acético', flaskColor:'#F2A65A', liquidColor:'rgba(242,166,90,0.20)',
+    type:'weak-electrolyte', ionizationFactor:0.35, chip:'Eletrólito fraco', chipClass:'weak',
+    concentrationAdjustable:true, baseConcentration:50,
+    cation:{ label:'H₃O⁺' }, anion:{ label:'CH₃COO⁻' }, neutral:{ label:'CH₃COOH', color:'#F2A65A' },
+    equation:'CH₃COOH + H₂O ⇌ H₃O⁺ + CH₃COO⁻',
+    inWater:'Só uma pequena parte do ácido acético reage com a água e forma íons H₃O⁺ e CH₃COO⁻. A maioria continua como moléculas neutras.' },
+  { id:'limao', name:'Suco de limão', short:'Ác. cítrico', flaskColor:'#D4E86A', liquidColor:'rgba(212,232,106,0.20)',
+    type:'weak-electrolyte', ionizationFactor:0.32, chip:'Eletrólito fraco', chipClass:'weak',
+    concentrationAdjustable:true, baseConcentration:55,
+    cation:{ label:'H₃O⁺' }, anion:{ label:'citrato⁻' }, neutral:{ label:'ácido cítrico', color:'#D4E86A' },
+    equation:'ácido cítrico + H₂O ⇌ H₃O⁺ + citrato⁻',
+    inWater:'O ácido cítrico do limão forma poucos íons H₃O⁺ e citrato. A maioria das moléculas continua neutra.' },
+  { id:'alcool', name:'Álcool em água', short:'Etanol', flaskColor:'#CFE3F5', liquidColor:'rgba(207,227,245,0.18)',
+    type:'non-electrolyte', chip:'Não eletrólito', chipClass:'none',
+    concentrationAdjustable:false, baseConcentration:100,
+    neutral:{ label:'C₂H₅OH', color:'#CFE3F5' },
+    fixedNote:'Concentração fixa: mais álcool não forma íons.',
+    inWater:'O álcool (etanol) se mistura à água, mas suas moléculas continuam inteiras e eletricamente neutras.' },
+  { id:'amonia', name:'Amônia diluída', short:'NH₃', flaskColor:'#C9A6F5', liquidColor:'rgba(201,166,245,0.20)',
+    type:'weak-electrolyte', ionizationFactor:0.28, chip:'Eletrólito fraco', chipClass:'weak',
+    concentrationAdjustable:true, baseConcentration:50,
+    cation:{ label:'NH₄⁺' }, anion:{ label:'OH⁻' }, neutral:{ label:'NH₃', color:'#E8ECF6' },
+    equation:'NH₃ + H₂O ⇌ NH₄⁺ + OH⁻',
+    inWater:'Só uma pequena parte da amônia reage com a água e forma íons NH₄⁺ e OH⁻. A maioria continua como moléculas neutras.' },
+  { id:'hcl', name:'Ácido clorídrico', short:'HCl', flaskColor:'#9FB8FF', liquidColor:'rgba(159,184,255,0.20)',
+    type:'strong-electrolyte', chip:'Eletrólito forte', chipClass:'strong',
+    concentrationAdjustable:true, baseConcentration:60,
+    cation:{ label:'H₃O⁺' }, anion:{ label:'Cl⁻' }, equation:'HCl + H₂O → H₃O⁺ + Cl⁻',
+    inWater:'O HCl reage com a água e praticamente todas as suas moléculas formam íons H₃O⁺ e Cl⁻.' },
+  { id:'naoh', name:'Soda cáustica', short:'NaOH', flaskColor:'#B9C4DA', liquidColor:'rgba(185,196,218,0.20)',
+    type:'strong-electrolyte', chip:'Eletrólito forte', chipClass:'strong',
+    concentrationAdjustable:true, baseConcentration:50,
+    cation:{ label:'Na⁺' }, anion:{ label:'OH⁻' }, equation:'NaOH → Na⁺ + OH⁻',
+    inWater:'A soda cáustica (NaOH) se separa em íons Na⁺ e OH⁻ ao se dissolver na água.' },
+  { id:'kbr', name:'Solução de KBr', short:'KBr', flaskColor:'#F0708A', liquidColor:'rgba(240,112,138,0.20)',
+    type:'strong-electrolyte', chip:'Eletrólito forte', chipClass:'strong',
+    concentrationAdjustable:true, baseConcentration:85,
+    cation:{ label:'K⁺' }, anion:{ label:'Br⁻' }, equation:'KBr → K⁺ + Br⁻',
+    inWater:'O brometo de potássio (KBr) se separa em íons K⁺ e Br⁻ ao se dissolver na água.' }
+];
+const byId = id => SOLUTIONS.find(s => s.id === id);
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ===================== UTIL ===================== */
+const $ = sel => document.querySelector(sel);
+function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function hexToRgba(hex, a){
+  const n = parseInt(hex.replace('#', ''), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+}
+
+/* ===================== MODELO DE CONDUTIVIDADE ===================== */
+const CONDUCT_THRESHOLD = 6;   /* abaixo: corrente pequena demais para o LED */
+const STRONG_THRESHOLD = 40;   /* acima: LED aceso / condutividade alta */
+
+function conductivityScore(sol, concentration){
+  if(sol.type === 'non-electrolyte') return 0;
+  const factor = sol.type === 'weak-electrolyte' ? (sol.ionizationFactor || 0.35) : 1;
+  return clamp(concentration * factor, 0, 100);
+}
+function ledFromScore(score){ if(score < CONDUCT_THRESHOLD) return 'off'; if(score < STRONG_THRESHOLD) return 'weak'; return 'strong'; }
+function ledIntensity(led, score){
+  if(led === 'off') return 0;
+  if(led === 'weak') return 0.24 + 0.26 * clamp((score - CONDUCT_THRESHOLD) / (STRONG_THRESHOLD - CONDUCT_THRESHOLD), 0, 1);
+  return 0.74 + 0.26 * clamp((score - STRONG_THRESHOLD) / (100 - STRONG_THRESHOLD), 0, 1);
+}
+const LEVEL_BY_LED = {
+  off:   { text:'BAIXA', cls:'lvl-baixa', idx:0 },
+  weak:  { text:'MÉDIA', cls:'lvl-media', idx:1 },
+  strong:{ text:'ALTA',  cls:'lvl-alta',  idx:2 }
+};
+const LED_TEXT = { off:'LED apagado', weak:'LED fraco', strong:'LED aceso' };
+const LED_TEXT_COLOR = { off:'#6B82AE', weak:'#F2A65A', strong:'#FBE38A' };
+const hasIons = sol => sol.type !== 'non-electrolyte';
+
+/* partículas desenhadas: forte = só íons; fraco = muitas moléculas + poucos íons;
+   não eletrólito = só moléculas. Pares de íons proporcionais ao índice do modelo. */
+function particleTargets(type, score, concentration){
+  if(type === 'non-electrolyte') return { neutral:12, cation:0, anion:0 };
+  const pairs = Math.max(1, Math.round(1 + (score / 100) * 9));
+  const neutral = type === 'weak-electrolyte' ? Math.round(5 + (concentration / 100) * 7) : 0;
+  return { neutral, cation:pairs, anion:pairs };
+}
+
+/* aplica o estado visual do LED (cúpula, reflexo e brilho) */
+function paintLED(dome, hl, glow, glowG, intensity, rMin, rMax){
+  if(intensity <= 0){
+    dome.style.fill = '#26314d'; dome.style.fillOpacity = 1; dome.classList.remove('lit');
+    hl.style.opacity = 0.12;
+    glow.style.opacity = 0; glowG.classList.remove('lit');
+    return;
+  }
+  dome.style.fill = '#FBE38A';
+  dome.style.fillOpacity = 0.4 + 0.6 * intensity;
+  dome.classList.add('lit');
+  hl.style.opacity = 0.25 + 0.6 * intensity;
+  glow.style.opacity = 0.2 + 0.8 * intensity;
+  glow.setAttribute('r', String(rMin + (rMax - rMin) * intensity));
+  glowG.classList.add('lit');
+}
+
+/* ======================================================================
+   CAMPO DE PARTÍCULAS (usado na bancada e nas mini-simulações)
+   ====================================================================== */
+function ParticleField(canvas){
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  let W = 0, H = 0, parts = [], targets = { neutral:0, cation:0, anion:0 }, pending = true;
+
+  function measure(){
+    const r = canvas.getBoundingClientRect();
+    if(r.width < 20 || r.height < 20) return false;
+    if(Math.abs(r.width - W) > 0.5 || Math.abs(r.height - H) > 0.5){
+      if(W && H){ const sx = r.width / W, sy = r.height / H; parts.forEach(p => { p.x *= sx; p.y *= sy; }); }
+      W = r.width; H = r.height;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    return true;
+  }
+  function make(type){
+    const sp = type === 'neutral' ? 10 : 8;
+    return { x:Math.random() * W, y:Math.random() * H, vx:(Math.random() - 0.5) * sp, vy:(Math.random() - 0.5) * sp, type };
+  }
+  function sync(){
+    ['neutral', 'cation', 'anion'].forEach(type => {
+      let diff = targets[type] - parts.filter(p => p.type === type).length;
+      while(diff > 0){ parts.push(make(type)); diff--; }
+      if(diff < 0){
+        let remove = -diff;
+        parts = parts.filter(p => { if(remove > 0 && p.type === type){ remove--; return false; } return true; });
+      }
+    });
+  }
+  function step(dt, drift, speed){
+    parts.forEach(p => {
+      const isIon = p.type !== 'neutral';
+      if(drift && isIon){
+        /* cátions → eletrodo (−) à direita; ânions → eletrodo (+) à esquerda */
+        const target = (p.type === 'cation' ? 1 : -1) * speed;
+        p.vx += (target - p.vx) * 0.05;
+        p.vy = clamp(p.vy - p.vy * 0.04 + (Math.random() - 0.5) * 4, -12, 12);
+      } else {
+        p.vx = clamp(p.vx + (Math.random() - 0.5) * 3, -14, 14);
+        p.vy = clamp(p.vy + (Math.random() - 0.5) * 3, -14, 14);
+      }
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if(drift && isIon){
+        if(p.x > W + 8){ p.x = -8; p.y = Math.random() * H; }
+        else if(p.x < -8){ p.x = W + 8; p.y = Math.random() * H; }
+      } else {
+        if(p.x < 4){ p.x = 4; p.vx = Math.abs(p.vx); }
+        if(p.x > W - 4){ p.x = W - 4; p.vx = -Math.abs(p.vx); }
+      }
+      if(p.y < 4){ p.y = 4; p.vy = Math.abs(p.vy); }
+      if(p.y > H - 4){ p.y = H - 4; p.vy = -Math.abs(p.vy); }
+    });
+  }
+  function draw(neutralColor, trails){
+    ctx.clearRect(0, 0, W, H);
+    const rad = clamp(W / 32, 3, 9);
+    if(trails){
+      /* rastro curto atrás dos íons que estão migrando */
+      ctx.lineCap = 'round';
+      parts.forEach(p => {
+        if(p.type === 'neutral' || Math.abs(p.vx) < 10) return;
+        const len = clamp(Math.abs(p.vx) * 0.28, 4, 16) * Math.sign(p.vx);
+        const g = ctx.createLinearGradient(p.x - len, p.y, p.x, p.y);
+        g.addColorStop(0, hexToRgba(ION_COLOR[p.type], 0));
+        g.addColorStop(1, hexToRgba(ION_COLOR[p.type], 0.45));
+        ctx.strokeStyle = g; ctx.lineWidth = rad * 1.1;
+        ctx.beginPath(); ctx.moveTo(p.x - len, p.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+      });
+    }
+    parts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
+      if(p.type === 'neutral'){
+        const c = neutralColor || '#93A5C9';
+        ctx.fillStyle = hexToRgba(c, 0.16); ctx.fill();
+        ctx.strokeStyle = hexToRgba(c, 0.85); ctx.lineWidth = 1.6; ctx.stroke();
+      } else {
+        ctx.fillStyle = ION_COLOR[p.type]; ctx.fill();
+        const s = rad * 0.52;
+        ctx.strokeStyle = '#0B1220'; ctx.lineWidth = Math.max(1.4, rad * 0.3); ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p.x - s, p.y); ctx.lineTo(p.x + s, p.y);
+        if(p.type === 'cation'){ ctx.moveTo(p.x, p.y - s); ctx.lineTo(p.x, p.y + s); }
+        ctx.stroke();
+      }
+    });
+  }
+  return {
+    setTargets(t, reset){ targets = t; if(reset) parts = []; pending = true; },
+    frame(dt, opts){
+      if(!measure()) return;
+      if(pending){ sync(); pending = false; }
+      if(!REDUCED_MOTION) step(dt, opts.drift, opts.speed);
+      draw(opts.neutralColor, opts.drift && opts.trails);
+    }
+  };
+}
+
+/* um único laço de animação para tudo */
+const animators = [];
+let lastT = null;
+function mainLoop(t){
+  if(lastT === null) lastT = t;
+  const dt = Math.min(0.05, (t - lastT) / 1000);
+  lastT = t;
+  animators.forEach(a => a(dt));
+  requestAnimationFrame(mainLoop);
+}
+
+/* ======================================================================
+   BANCADA DO LABORATÓRIO
+   Circuito fechado = eletrodo A e eletrodo B dentro da solução.
+   O LED depende apenas do circuito fechado + quantidade de íons.
+   ====================================================================== */
+function createBench(onChange){
+  const inner = $('#bench-inner');
+  const svg = inner.querySelector('svg');
+  const wires = svg.querySelectorAll('.wire');
+  const ledEls = { dome:$('#led-dome'), hl:$('#led-hl'), glow:$('#led-glow'), glowG:$('#led-glow-g'), state:$('#led-state') };
+  const liquidPath = $('#liquid-path');
+  const liquidSurface = $('#liquid-surface');
+  const liquidClip = $('#liq-clip-path');
+  const stopTop = $('#liq-stop-top'), stopBot = $('#liq-stop-bot');
+  const rodA = inner.querySelector('.electrode-rod[data-electrode="A"]');
+  const rodB = inner.querySelector('.electrode-rod[data-electrode="B"]');
+  const particlesWrap = $('#particles-wrap');
+  const field = ParticleField($('#particles-canvas'));
+
+  /* geometria — deve bater com o SVG (viewBox "120 0 360 420") */
+  const VB_X = 120, VB_W = 360;
+  const CONTACT_Y = 196, PARKED_TIP_Y = 246, INSERTED_TIP_Y = 368;
+  const AX = 190, BX = 410;
+  const LIQ_L = 146, LIQ_T = 258, LIQ_R = 454, LIQ_B = 384;
+  const CANVAS_T = LIQ_T + 4;   /* partículas abaixo da superfície ondulada */
+  const ROD_W_PX = 12;
+
+  /* superfície do líquido: ondulação suave + "marola" quando um eletrodo entra/sai */
+  let waveT = 0, ripple = 0;
+  function drawLiquid(){
+    const amp = 1.2 + ripple;
+    const pts = [];
+    for(let x = LIQ_L; x <= LIQ_R + 0.1; x += 14){
+      const y = LIQ_T + amp * Math.sin(x * 0.045 + waveT * 1.5) + amp * 0.55 * Math.sin(x * 0.11 - waveT * 2.2);
+      pts.push(x.toFixed(1) + ',' + y.toFixed(2));
+    }
+    const top = 'M' + pts.join(' L');
+    const body = top + ` L${LIQ_R},${LIQ_B - 6} Q${LIQ_R},${LIQ_B} ${LIQ_R - 6},${LIQ_B} L${LIQ_L + 6},${LIQ_B} Q${LIQ_L},${LIQ_B} ${LIQ_L},${LIQ_B - 6} Z`;
+    liquidPath.setAttribute('d', body);
+    liquidClip.setAttribute('d', body);
+    liquidSurface.setAttribute('d', top);
+  }
+  drawLiquid();
+
+  const state = { solutionId:'sal', concentration:byId('sal').baseConcentration, electrodeA:false, electrodeB:false };
+  const currentSolution = () => byId(state.solutionId);
+
+  function derived(){
+    const sol = currentSolution();
+    const score = conductivityScore(sol, state.concentration);
+    const circuitClosed = state.electrodeA && state.electrodeB;
+    const led = circuitClosed ? ledFromScore(score) : 'off';
+    return { sol, score, circuitClosed, led, conducting:circuitClosed && led !== 'off' };
+  }
+
+  function applyRodHeight(rod, inserted){
+    rod.style.height = ((inserted ? rod.dataset.insertedPx : rod.dataset.parkedPx) || 0) + 'px';
+  }
+  function layout(){
+    const rect = inner.getBoundingClientRect();
+    if(rect.width < 1) return;
+    const scale = rect.width / VB_W;
+    [[rodA, AX], [rodB, BX]].forEach(([rod, x]) => {
+      rod.style.left = ((x - VB_X) * scale - ROD_W_PX / 2) + 'px';
+      rod.style.top = (CONTACT_Y * scale) + 'px';
+      rod.dataset.parkedPx = String((PARKED_TIP_Y - CONTACT_Y) * scale);
+      rod.dataset.insertedPx = String((INSERTED_TIP_Y - CONTACT_Y) * scale);
+    });
+    applyRodHeight(rodA, state.electrodeA);
+    applyRodHeight(rodB, state.electrodeB);
+    particlesWrap.style.left = ((LIQ_L - VB_X) * scale) + 'px';
+    particlesWrap.style.top = (CANVAS_T * scale) + 'px';
+    particlesWrap.style.width = ((LIQ_R - LIQ_L) * scale) + 'px';
+    particlesWrap.style.height = ((LIQ_B - 3 - CANVAS_T) * scale) + 'px';
+  }
+  layout();
+  if(window.ResizeObserver) new ResizeObserver(layout).observe(inner);
+  else window.addEventListener('resize', layout);
+
+  animators.push(dt => {
+    if(inner.offsetParent === null) return;
+    const d = derived();
+    if(!REDUCED_MOTION){
+      waveT += dt;
+      ripple *= Math.exp(-dt * 1.4);
+      drawLiquid();
+    }
+    field.frame(dt, {
+      drift:d.circuitClosed && hasIons(d.sol),
+      speed:16 + d.score * 0.32,
+      neutralColor:d.sol.neutral && d.sol.neutral.color,
+      trails:true
+    });
+  });
+
+  /* eletrodos: toque alterna; arrastar posiciona */
+  function setupRod(rod, key){
+    let dragging = false, moved = false, startY = 0, startPx = 0;
+    rod.addEventListener('pointerdown', e => {
+      dragging = true; moved = false;
+      try{ rod.setPointerCapture(e.pointerId); }catch(err){}
+      startY = e.clientY;
+      startPx = parseFloat(state[key] ? rod.dataset.insertedPx : rod.dataset.parkedPx) || 0;
+      rod.style.transition = 'none';
+    });
+    rod.addEventListener('pointermove', e => {
+      if(!dragging) return;
+      const dy = e.clientY - startY;
+      if(Math.abs(dy) > 6) moved = true;
+      rod.style.height = clamp(startPx + dy, parseFloat(rod.dataset.parkedPx) || 0, parseFloat(rod.dataset.insertedPx) || 0) + 'px';
+    });
+    function end(){
+      if(!dragging) return;
+      dragging = false;
+      rod.style.transition = '';
+      if(!moved){ setElectrode(key, !state[key]); return; }
+      const parked = parseFloat(rod.dataset.parkedPx) || 0, inserted = parseFloat(rod.dataset.insertedPx) || 0;
+      setElectrode(key, (parseFloat(rod.style.height) || parked) > (parked + inserted) / 2);
+    }
+    rod.addEventListener('pointerup', end);
+    rod.addEventListener('pointercancel', end);
+    rod.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); setElectrode(key, !state[key]); }
+    });
+  }
+  setupRod(rodA, 'electrodeA');
+  setupRod(rodB, 'electrodeB');
+
+  function setElectrode(key, val){ if(state[key] !== val) ripple = 2.6; state[key] = val; update(); }
+  function setBothElectrodes(val){
+    if(state.electrodeA !== val || state.electrodeB !== val) ripple = 3;
+    state.electrodeA = val; state.electrodeB = val; update();
+  }
+  function refreshParticles(reset){
+    const sol = currentSolution();
+    field.setTargets(particleTargets(sol.type, conductivityScore(sol, state.concentration), state.concentration), reset);
+  }
+  function setSolution(id){
+    if(!byId(id)) return;
+    state.solutionId = id;
+    state.concentration = byId(id).baseConcentration;
+    refreshParticles(true);
+    update();
+  }
+  function setConcentration(v){ state.concentration = clamp(v, 10, 100); refreshParticles(false); update(); }
+
+  function reading(){
+    const d = derived();
+    return { solution:d.sol, score:d.score, concentration:state.concentration,
+      electrodeA:state.electrodeA, electrodeB:state.electrodeB,
+      circuitClosed:d.circuitClosed, led:d.led, conducting:d.conducting };
+  }
+
+  function update(){
+    const d = derived();
+    applyRodHeight(rodA, state.electrodeA);
+    applyRodHeight(rodB, state.electrodeB);
+    rodA.classList.toggle('inserted', state.electrodeA);
+    rodB.classList.toggle('inserted', state.electrodeB);
+    rodA.setAttribute('aria-pressed', String(state.electrodeA));
+    rodB.setAttribute('aria-pressed', String(state.electrodeB));
+
+    wires.forEach(w => {
+      w.classList.toggle('energized', d.circuitClosed);
+      w.classList.toggle('flowing', d.conducting);
+      w.style.animationDuration = d.led === 'strong' ? '0.6s' : '1.5s';
+    });
+
+    paintLED(ledEls.dome, ledEls.hl, ledEls.glow, ledEls.glowG, ledIntensity(d.led, d.score), 26, 74);
+    ledEls.state.textContent = LED_TEXT[d.led].toUpperCase();
+    ledEls.state.style.fill = LED_TEXT_COLOR[d.led];
+
+    stopTop.setAttribute('stop-color', d.sol.flaskColor);
+    stopBot.setAttribute('stop-color', d.sol.flaskColor);
+    liquidSurface.style.stroke = hexToRgba(d.sol.flaskColor, 0.7);
+    onChange(reading());
+  }
+
+  return { setSolution, setConcentration, setElectrode, setBothElectrodes, reading };
+}
+
+/* ======================================================================
+   LABORATÓRIO — interface
+   ====================================================================== */
+let bench = null;
+
+function legendHTML(sol){
+  const parts = [];
+  if(hasIons(sol)){
+    parts.push(`<span><i class="lg-ion" style="background:${ION_COLOR.cation}">+</i>${sol.cation.label}</span>`);
+    parts.push(`<span><i class="lg-ion" style="background:${ION_COLOR.anion}">−</i>${sol.anion.label}</span>`);
+  }
+  if(sol.neutral) parts.push(`<span><i class="lg-mol" style="border-color:${sol.neutral.color}"></i>${sol.neutral.label} (neutra)</span>`);
+  return parts.join('');
+}
+
+function behaviorText(r){
+  const sol = r.solution;
+  if(!hasIons(sol)) return sol.id === 'destilada' ? 'Quase sem íons: nada leva a corrente.' : 'Só moléculas neutras: nada leva a corrente.';
+  if(r.conducting) return 'Íons em movimento: (+) vão para o eletrodo B e (−) para o A.';
+  if(r.circuitClosed) return 'Poucos íons se movendo: corrente fraca demais para o LED.';
+  return 'Íons se movendo ao acaso. Feche o circuito com os eletrodos.';
+}
+
+/* ---------- explicação do resultado ----------
+   cadeia: soluto → partículas → movimento → corrente → LED
+   cada elo recebe um estado: on (forte), weak (fraco), idle (sem corrente), off (bloqueado) */
+const ICO = {
+  flask:c => `<svg width="18" height="22" viewBox="0 0 30 34"><path d="M12,3 L12,12 L4,28 Q2,32 7,32 L23,32 Q28,32 26,28 L18,12 L18,3" fill="none" stroke="#93A5C9" stroke-width="2.2" stroke-linejoin="round"/><path d="M6,25 Q15,21 24,25 L26,28 Q28,32 23,32 L7,32 Q2,32 4,28 Z" fill="${c}"/></svg>`,
+  ion:(x, y, pos, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${pos ? ION_COLOR.cation : ION_COLOR.anion}"/><path d="M${x - r * 0.5},${y} h${r}${pos ? ` M${x},${y - r * 0.5} v${r}` : ''}" stroke="#0B1220" stroke-width="1.6" stroke-linecap="round"/>`,
+  mol:(x, y, c, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${hexToRgba(c, 0.15)}" stroke="${c}" stroke-width="1.5"/>`,
+  particles(sol){
+    const c = sol.neutral ? sol.neutral.color : '#93A5C9';
+    let inner;
+    if(sol.type === 'strong-electrolyte') inner = this.ion(8, 7, true, 5) + this.ion(21, 8, false, 5) + this.ion(14, 16, true, 5);
+    else if(sol.type === 'weak-electrolyte') inner = this.mol(7, 7, c, 4.5) + this.mol(21, 7, c, 4.5) + this.ion(14, 16, true, 4.5);
+    else inner = this.mol(8, 8, c, 5) + this.mol(20, 9, c, 5) + this.mol(14, 17, c, 4);
+    return `<svg width="28" height="22" viewBox="0 0 28 22">${inner}</svg>`;
+  },
+  move:st => st === 'off'
+    ? `<svg width="22" height="18" viewBox="0 0 22 18"><path d="M5,4 L17,14 M17,4 L5,14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+    : st === 'idle'
+      ? `<svg width="24" height="18" viewBox="0 0 24 18"><path d="M3,9 q3,-6 6,0 t6,0 t6,0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
+      : `<svg width="24" height="18" viewBox="0 0 24 18"><path d="M3,5 H19 M15,2 L19,5 L15,8 M21,13 H5 M9,10 L5,13 L9,16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  bolt:st => st === 'off'
+    ? `<svg width="20" height="20" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4,20 L20,4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`
+    : `<svg width="20" height="20" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>`,
+  led:led => `<span class="led-dot${led === 'off' ? '' : ' ' + led}"></span>`
+};
+
+function explainModel(r, missing){
+  const sol = r.solution;
+  const ions = hasIons(sol);
+  const strongType = sol.type === 'strong-electrolyte';
+  const ledWord = { off:'apagado', weak:'fraco', strong:'aceso' }[r.led];
+
+  /* elos da cadeia */
+  const plenty = strongType && r.score >= STRONG_THRESHOLD;   /* forte e não muito diluído */
+  const nParticles = ions
+    ? { st:plenty ? 'on' : 'weak', cap:plenty ? 'muitos íons' : (strongType ? 'menos íons' : 'poucos íons') }
+    : { st:'off', cap:sol.id === 'destilada' ? 'quase sem íons' : 'sem íons' };
+  let nMove, nCurrent;
+  if(!ions){ nMove = { st:'off', cap:'sem cargas' }; }
+  else if(!r.circuitClosed){ nMove = { st:'idle', cap:'ao acaso' }; }
+  else { nMove = { st:r.led === 'strong' ? 'on' : 'weak', cap:'íons migram' }; }
+  if(!r.circuitClosed) nCurrent = { st:'off', cap:'circuito aberto' };
+  else if(r.led === 'strong') nCurrent = { st:'on', cap:'forte' };
+  else if(r.led === 'weak') nCurrent = { st:'weak', cap:'fraca' };
+  else nCurrent = { st:'off', cap:ions ? 'mínima' : 'nenhuma' };
+  const nLed = { st:r.led === 'strong' ? 'on' : (r.led === 'weak' ? 'weak' : 'off'), cap:ledWord };
+
+  const chain = [
+    { st:'on', cap:sol.short, ico:ICO.flask(sol.flaskColor) },
+    { ...nParticles, ico:ICO.particles(sol) },
+    { ...nMove, ico:ICO.move(nMove.st) },
+    { ...nCurrent, ico:ICO.bolt(nCurrent.st) },
+    { ...nLed, ico:ICO.led(r.led) }
+  ];
+
+  /* linhas de texto: causa → consequência */
+  const lines = [];
+  if(!r.circuitClosed){
+    lines.push({ tag:'NO CIRCUITO', warn:true,
+      text:(missing ? `Falta o eletrodo ${missing} na solução.` : 'Os eletrodos estão fora da solução.')
+        + ' Com o circuito aberto, a corrente não tem caminho, mesmo que existam íons. Coloque os dois eletrodos para testar.' });
+    if(ions) lines.push({ tag:'NA SOLUÇÃO', text:'Os íons já estão lá, mas se movem ao acaso: sem circuito fechado, não há corrente.' });
+    return { title:'Por que o LED está apagado?', chain, lines, eq:null };
+  }
+
+  lines.push({ tag:'NA ÁGUA', text:sol.inWater });
+  if(!ions){
+    lines.push({ tag:'NA SOLUÇÃO', text:'Sem íons livres, não há partículas com carga para se mover entre os eletrodos.' });
+    lines.push({ tag:'NO CIRCUITO', text:sol.id === 'destilada'
+      ? 'A corrente praticamente não atravessa a solução, então o LED fica apagado.'
+      : 'A corrente não atravessa a solução, então o LED fica apagado. Colocar mais dessa substância não muda isso, porque ela não forma íons.' });
+  } else if(strongType){
+    lines.push({ tag:'NA SOLUÇÃO', text:'Esses íons têm carga e se movem livremente: os positivos vão para o eletrodo B (−) e os negativos para o A (+).' });
+    lines.push({ tag:'NO CIRCUITO', text:r.led === 'strong'
+      ? 'Esse movimento de cargas leva a corrente de um eletrodo ao outro. Como há muitos íons, a corrente é forte e o LED acende.'
+      : 'Os íons conduzem, mas há pouco soluto dissolvido: menos íons, corrente menor e LED fraco. Aumente a concentração e compare.' });
+  } else {
+    lines.push({ tag:'NA SOLUÇÃO', text:'Os poucos íons se movem até os eletrodos (positivos para o B, negativos para o A). As moléculas neutras não levam carga.' });
+    lines.push({ tag:'NO CIRCUITO', text:r.led === 'weak'
+      ? 'Com poucos íons em movimento, a corrente é pequena e o LED acende fraco.'
+      : 'Com a solução muito diluída, os íons são tão poucos que a corrente não basta para acender o LED.' });
+  }
+  return { title:`Por que o LED está ${ledWord}?`, chain, lines, eq:sol.equation || null };
+}
+
+function renderExplain(model){
+  $('#ex-title').textContent = model.title;
+  $('#ex-chain').innerHTML = model.chain.map((n, i) =>
+    (i ? `<span class="cn-sep ${n.st}">›</span>` : '') +
+    `<div class="cn ${n.st}"><span class="cn-ico">${n.ico}</span><span class="cn-cap">${n.cap}</span></div>`
+  ).join('');
+  $('#ex-lines').innerHTML = model.lines.map(l =>
+    `<div class="ex-line${l.warn ? ' warn' : ''}"><span class="ex-tag">${l.tag}</span><span>${l.text}</span></div>`
+  ).join('');
+  const eq = $('#ex-eq');
+  eq.hidden = !model.eq;
+  eq.textContent = model.eq || '';
+}
+
+function setupLab(){
+  const grid = $('#flask-grid');
+  grid.innerHTML = SOLUTIONS.map(s =>
+    `<button class="flask-btn" type="button" data-sol="${s.id}" aria-pressed="false">${flaskSVG(s.flaskColor)}<span class="flask-name">${s.name}</span></button>`
+  ).join('');
+  let lastSolId = null;
+
+  function updateLabUI(r){
+    const sol = r.solution;
+
+    grid.querySelectorAll('.flask-btn').forEach(b => {
+      const on = b.dataset.sol === sol.id;
+      b.classList.toggle('selected', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+
+    if(lastSolId !== sol.id){
+      lastSolId = sol.id;
+      $('#bench-swatch').style.background = sol.flaskColor;
+      $('#bench-sol-name').textContent = sol.name;
+      const chip = $('#bench-type-chip');
+      chip.textContent = sol.chip;
+      chip.className = 'type-chip ' + sol.chipClass;
+      $('#ion-legend').innerHTML = legendHTML(sol);
+    }
+
+    const concBlock = $('#conc-block'), concFixed = $('#conc-fixed');
+    concBlock.hidden = !sol.concentrationAdjustable;
+    concFixed.hidden = sol.concentrationAdjustable;
+    if(sol.concentrationAdjustable){
+      const input = $('#conc-range');
+      if(document.activeElement !== input) input.value = r.concentration;
+      input.style.setProperty('--fill', ((r.concentration - 10) / 90 * 100) + '%');
+      $('#conc-val').innerHTML = `${Math.round(r.concentration)}<small>/100</small>`;
+    } else {
+      concFixed.textContent = sol.fixedNote;
+    }
+
+    const cChip = $('#circuit-chip');
+    cChip.className = 'circuit-chip ' + (r.circuitClosed ? 'closed' : 'open');
+    cChip.textContent = r.circuitClosed ? 'Circuito fechado' : 'Circuito aberto';
+
+    const btn = $('#btn-electrodes');
+    btn.classList.toggle('is-in', r.circuitClosed);
+    const missing = !r.electrodeA && !r.electrodeB ? null : (!r.electrodeA ? 'A' : (!r.electrodeB ? 'B' : ''));
+    $('#btn-electrodes-text').textContent = r.circuitClosed ? 'Retirar os eletrodos'
+      : (missing ? `Colocar o eletrodo ${missing}` : 'Colocar os eletrodos na solução');
+
+    $('#particle-behavior').textContent = behaviorText(r);
+
+    /* resultado */
+    const lvlEl = $('#res-level');
+    const fills = [0, 0, 0];
+    const labels = document.querySelectorAll('.meter-labels span');
+    labels.forEach(l => l.classList.remove('on'));
+    $('#res-led').textContent = LED_TEXT[r.led];
+    $('#res-led-dot').className = 'led-dot' + (r.led === 'off' ? '' : ' ' + r.led);
+
+    if(!r.circuitClosed){
+      lvlEl.textContent = '—';
+      lvlEl.className = 'result-level lvl-wait';
+    } else {
+      const lvl = LEVEL_BY_LED[r.led];
+      lvlEl.textContent = lvl.text;
+      lvlEl.className = 'result-level ' + lvl.cls;
+      labels[lvl.idx].classList.add('on');
+      const s = r.score;
+      fills[0] = Math.max(0.14, clamp(s / CONDUCT_THRESHOLD, 0, 1));
+      fills[1] = clamp((s - CONDUCT_THRESHOLD) / (STRONG_THRESHOLD - CONDUCT_THRESHOLD), 0, 1);
+      fills[2] = clamp((s - STRONG_THRESHOLD) / (100 - STRONG_THRESHOLD), 0, 1);
+    }
+    renderExplain(explainModel(r, missing));
+    fills.forEach((f, i) => { $('#mf-' + i).style.width = (f * 100) + '%'; });
+  }
+
+  bench = createBench(updateLabUI);
+  bench.setSolution('sal');
+
+  grid.addEventListener('click', e => {
+    const b = e.target.closest('.flask-btn');
+    if(b) bench.setSolution(b.dataset.sol);
+  });
+  $('#conc-range').addEventListener('input', e => bench.setConcentration(parseInt(e.target.value, 10)));
+  $('#btn-electrodes').addEventListener('click', () => bench.setBothElectrodes(!bench.reading().circuitClosed));
+}
+
+function flaskSVG(color){
+  return `<svg width="20" height="24" viewBox="0 0 30 34" aria-hidden="true">
+    <path d="M12,3 L12,12 L4,28 Q2,32 7,32 L23,32 Q28,32 26,28 L18,12 L18,3" fill="none" stroke="#6B82AE" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M6,25 Q15,21 24,25 L26,28 Q28,32 23,32 L7,32 Q2,32 4,28 Z" fill="${color}" opacity="0.85"/>
+    <line x1="10" y1="3" x2="20" y2="3" stroke="#6B82AE" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ======================================================================
+   CONCEITOS — mini-simulações animadas (mesmo circuito, em miniatura)
+   ====================================================================== */
+const MINI_CONFIG = {
+  hero:      { sol:'sal',     conc:70 },
+  strong:    { sol:'sal',     conc:70 },
+  weak:      { sol:'vinagre', conc:60 },
+  none:      { sol:'acucar',  conc:100 },
+  dilute:    { sol:'sal',     conc:15 },
+  conc:      { sol:'sal',     conc:95 },
+  sugarMore: { sol:'acucar',  conc:100, targets:{ neutral:22, cation:0, anion:0 } }
+};
+
+/* geometria igual à da bancada do laboratório (mesmas proporções),
+   recortada pelo viewBox "130 30 340 366" */
+const ML = { L:146, T:258, R:454, B:384 };
+let miniUid = 0;
+
+function miniLabSVG(uid, sol){
+  return `<svg viewBox="130 30 340 366" aria-hidden="true">
+    <defs>
+      <linearGradient id="mlg-${uid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${sol.flaskColor}" stop-opacity="0.36"/>
+        <stop offset="1" stop-color="${sol.flaskColor}" stop-opacity="0.14"/>
+      </linearGradient>
+      <clipPath id="mlc-${uid}"><path class="ml-clip" d="M146,258 H454 V384 H146 Z"/></clipPath>
+    </defs>
+    <path class="wire" d="M207,128 L190,128 L190,196"/>
+    <path class="wire" d="M318,128 L350,128"/>
+    <path class="wire" d="M370,128 L410,128 L410,196"/>
+    <rect class="battery-nub" x="207" y="119" width="8" height="18" rx="2"/>
+    <rect class="battery-body" x="214" y="106" width="104" height="44" rx="7"/>
+    <text class="sign-plus" x="233" y="136" font-size="22" text-anchor="middle">+</text>
+    <text class="sign-minus" x="299" y="136" font-size="22" text-anchor="middle">−</text>
+    <g class="led-glow-g"><circle class="led-glow" cx="360" cy="86" r="30" fill="url(#ledGlowGrad)"/></g>
+    <path class="led-leg" d="M350,128 V108 M370,128 V108"/>
+    <rect class="led-rim" x="338" y="104" width="44" height="7" rx="2"/>
+    <path class="led-dome" d="M342,104 V82 A18,18 0 0 1 378,82 V104 Z"/>
+    <ellipse class="led-hl" cx="352" cy="86" rx="3.5" ry="9"/>
+    <path class="ml-liquid" fill="url(#mlg-${uid})" d="M146,258 H454 V384 H146 Z"/>
+    <g clip-path="url(#mlc-${uid})"><rect class="liq-sheen" x="146" y="250" width="70" height="140" fill="url(#sheenGradG)"/></g>
+    <path class="liq-surface ml-surface" style="stroke:${hexToRgba(sol.flaskColor, 0.7)}" d="M146,258 H454"/>
+    <path class="beaker-glass" d="M136,232 L142,237 L142,378 Q142,388 152,388 L448,388 Q458,388 458,378 L458,237 L464,232"/>
+  </svg>
+  <canvas></canvas>
+  <svg viewBox="130 30 340 366" aria-hidden="true">
+    <rect x="184" y="196" width="12" height="172" rx="3" fill="url(#rodGradG)" stroke="#566079"/>
+    <rect x="404" y="196" width="12" height="172" rx="3" fill="url(#rodGradG)" stroke="#566079"/>
+    <rect x="181" y="191" width="18" height="9" rx="2" fill="#3a4870" stroke="#6B82AE"/>
+    <rect x="401" y="191" width="18" height="9" rx="2" fill="#3a4870" stroke="#6B82AE"/>
+    <text class="sign-plus" x="168" y="222" font-size="22" text-anchor="middle">+</text>
+    <text class="sign-minus" x="432" y="222" font-size="22" text-anchor="middle">−</text>
+  </svg>`;
+}
+
+function mountMiniLab(el){
+  const cfg = MINI_CONFIG[el.dataset.mini];
+  const sol = byId(cfg.sol);
+  const score = conductivityScore(sol, cfg.conc);
+  const led = ledFromScore(score);
+  const uid = ++miniUid;
+  el.innerHTML = miniLabSVG(uid, sol);
+  const svg = el.querySelector('svg');
+  if(led !== 'off') svg.querySelectorAll('.wire').forEach(w => {
+    w.classList.add('energized', 'flowing');
+    w.style.animationDuration = led === 'strong' ? '0.6s' : '1.5s';
+  });
+  paintLED(svg.querySelector('.led-dome'), svg.querySelector('.led-hl'), svg.querySelector('.led-glow'), svg.querySelector('.led-glow-g'),
+           ledIntensity(led, score), 26, 74);
+
+  /* superfície do líquido levemente ondulada (mesma ideia da bancada) */
+  const liquid = svg.querySelector('.ml-liquid'), surface = svg.querySelector('.ml-surface'), clip = svg.querySelector('.ml-clip');
+  const phase = Math.random() * 10;
+  let t = 0;
+  function drawLiquid(){
+    const pts = [];
+    for(let x = ML.L; x <= ML.R + 0.1; x += 14){
+      const y = ML.T + 1.3 * Math.sin(x * 0.045 + (t + phase) * 1.5) + 0.7 * Math.sin(x * 0.11 - (t + phase) * 2.2);
+      pts.push(x.toFixed(1) + ',' + y.toFixed(2));
+    }
+    const top = 'M' + pts.join(' L');
+    const body = top + ` L${ML.R},${ML.B - 6} Q${ML.R},${ML.B} ${ML.R - 6},${ML.B} L${ML.L + 6},${ML.B} Q${ML.L},${ML.B} ${ML.L},${ML.B - 6} Z`;
+    liquid.setAttribute('d', body);
+    clip.setAttribute('d', body);
+    surface.setAttribute('d', top);
+  }
+  drawLiquid();
+
+  const field = ParticleField(el.querySelector('canvas'));
+  field.setTargets(cfg.targets || particleTargets(sol.type, score, cfg.conc), true);
+  const opts = { drift:hasIons(sol), speed:16 + score * 0.32, neutralColor:sol.neutral && sol.neutral.color, trails:true };
+  animators.push(dt => {
+    if(el.offsetParent === null) return;
+    if(!REDUCED_MOTION){ t += dt; drawLiquid(); }
+    field.frame(dt, opts);
+  });
+}
+
+function setupConcepts(){
+  document.querySelectorAll('.mini-lab[data-mini]').forEach(mountMiniLab);
+  /* cadeia da abertura: substância → íons → movimento → corrente → LED */
+  const sal = byId('sal');
+  const nodes = [
+    { cap:'substância na água', ico:ICO.flask(sal.flaskColor) },
+    { cap:'forma íons + e −',   ico:ICO.particles(sal) },
+    { cap:'íons se movem',      ico:ICO.move('on') },
+    { cap:'corrente elétrica',  ico:ICO.bolt('on') },
+    { cap:'LED acende',         ico:ICO.led('strong') }
+  ];
+  $('#hero-chain').innerHTML = nodes.map((n, i) =>
+    (i ? '<span class="cn-sep on">›</span>' : '') +
+    `<div class="cn on"><span class="cn-ico">${n.ico}</span><span class="cn-cap">${n.cap}</span></div>`).join('');
+  /* ilustrações do quiz: sem animação para quem prefere movimento reduzido */
+  if(REDUCED_MOTION) document.querySelectorAll('.deco-svg').forEach(d => { try{ d.pauseAnimations(); }catch(e){} });
+}
+
+/* ======================================================================
+   QUIZ — a 1ª alternativa de cada questão é a correta;
+   a ordem das alternativas é embaralhada a cada tentativa.
+   ====================================================================== */
+const QUIZ_LEN = 10;
+const QUESTION_BANK = [
+  { id:'ions', q:'O que uma solução precisa ter para conduzir corrente elétrica de forma significativa?',
+    opts:['Íons (partículas com carga) livres para se movimentar', 'Muitas moléculas neutras dissolvidas', 'Uma cor intensa e bem visível', 'Uma temperatura bem acima da ambiente'],
+    exp:'Na solução, a corrente é feita pelo movimento de partículas carregadas. Sem íons livres, não há condução significativa.' },
+  { id:'acucar', q:'Na água com açúcar, o LED fica apagado mesmo com os dois eletrodos na solução. Por quê?',
+    opts:['O açúcar se dissolve como moléculas neutras e não forma íons', 'O açúcar não se dissolve na água', 'O açúcar forma uma camada isolante sobre os eletrodos', 'O açúcar consome a energia da bateria'],
+    exp:'O açúcar se dissolve, mas suas moléculas continuam neutras. Sem íons livres, a solução não conduz de forma significativa.' },
+  { id:'sal', q:'Por que a água com sal faz o LED acender com brilho forte?',
+    opts:['O sal se separa em íons Na⁺ e Cl⁻, que se movem livremente', 'O sal libera elétrons livres na água, como um metal', 'O sal deixa a água mais densa', 'O sal aquece a solução, e o calor gera a corrente'],
+    exp:'O sal de cozinha é um eletrólito forte: na água, praticamente todo ele se separa em íons Na⁺ e Cl⁻, que transportam a carga.' },
+  { id:'vinagre', q:'O vinagre faz o LED acender fraco. Como o ácido acético é classificado?',
+    opts:['Eletrólito fraco: só uma pequena parte das moléculas forma íons', 'Eletrólito forte: todas as moléculas formam íons', 'Não eletrólito: não forma nenhum íon', 'Condutor metálico dissolvido na água'],
+    exp:'No vinagre, poucas moléculas de ácido acético formam íons. Com poucos íons, a condução é fraca.' },
+  { id:'destilada', q:'Como a água destilada se comporta no teste de condutividade?',
+    opts:['Conduz muito pouco, pois quase não tem íons livres', 'Conduz muito bem, por ser água pura', 'Conduz tão bem quanto a água com sal', 'Conduz porque as moléculas de H₂O têm carga elétrica'],
+    exp:'A água destilada tem uma quantidade muito pequena de íons. A corrente é desprezível e o LED não acende.' },
+  { id:'eletrodos', q:'Qual é a função dos eletrodos no experimento?',
+    opts:['Fazer o contato entre o circuito e a solução, para a corrente passar por ela', 'Produzir os íons que conduzem a corrente', 'Aquecer a solução para facilitar a condução', 'Medir a concentração da solução'],
+    exp:'Os eletrodos ligam os fios à solução. A corrente só atravessa a solução se os dois estiverem mergulhados nela.' },
+  { id:'um-eletrodo', q:'Com água com sal no béquer, só o eletrodo A está dentro da solução. O que acontece com o LED?',
+    opts:['Fica apagado, porque o circuito continua aberto', 'Acende forte, porque o sal conduz bem', 'Acende fraco, porque só um eletrodo conduz', 'Pisca, alternando entre os eletrodos'],
+    exp:'Com um eletrodo fora da solução, não há caminho fechado para a corrente. Mesmo uma boa solução condutora não acende o LED.' },
+  { id:'retirar', q:'O LED está aceso com a água com sal. O que acontece se retirarmos os eletrodos da solução?',
+    opts:['O LED apaga, porque o circuito se abre', 'O LED continua aceso, porque os íons continuam na solução', 'O LED fica ainda mais forte', 'Os íons saem da solução junto com os eletrodos'],
+    exp:'Sem os eletrodos na solução, a corrente não tem caminho para passar. Os íons continuam lá, mas não há circuito fechado.' },
+  { id:'concentracao', q:'No laboratório, o que acontece quando aumentamos a concentração da água com sal?',
+    opts:['Há mais íons livres, e o LED brilha mais', 'Há menos íons livres, e o LED brilha menos', 'Nada muda, porque a concentração não afeta a condução', 'O sal deixa de ser um eletrólito'],
+    exp:'Mais sal dissolvido significa mais Na⁺ e Cl⁻ disponíveis para transportar carga, o que aumenta a condutividade.' },
+  { id:'forte-fraco', q:'Qual é a principal diferença entre um eletrólito forte e um eletrólito fraco?',
+    opts:['O forte forma íons em grande quantidade; o fraco forma poucos íons', 'O forte está sempre mais concentrado que o fraco', 'O fraco não se dissolve na água', 'O forte forma moléculas neutras; o fraco forma íons'],
+    exp:'Num eletrólito forte, quase todo o soluto vira íons. Num fraco, só uma pequena parte, e a maioria continua como molécula.' },
+  { id:'nao-eletrolito', q:'Qual destas soluções do laboratório contém um não eletrólito?',
+    opts:['Água com açúcar', 'Água com sal', 'Vinagre', 'Solução de KBr'],
+    exp:'O açúcar se dissolve sem formar íons, por isso é um não eletrólito. As outras soluções têm íons livres.' },
+  { id:'exemplo-forte', q:'Qual destas substâncias é um eletrólito forte?',
+    opts:['Cloreto de sódio (sal de cozinha)', 'Sacarose (açúcar)', 'Ácido acético (vinagre)', 'Amônia'],
+    exp:'O sal se separa praticamente por completo em íons. Ácido acético e amônia são eletrólitos fracos; o açúcar não forma íons.' },
+  { id:'led-apagado', q:'Os dois eletrodos estão na solução, mas o LED não acende. Qual é a conclusão mais adequada?',
+    opts:['A solução tem pouquíssimos íons livres e conduz muito pouco', 'A solução tem muitos íons livres', 'Os íons estão se movendo rápido demais', 'O LED só acende com soluções coloridas'],
+    exp:'Com o circuito fechado, o LED apagado indica que a solução não tem íons suficientes para gerar uma corrente perceptível.' },
+  { id:'portadores', q:'Dentro da solução, quem transporta a carga elétrica?',
+    opts:['Os íons: cátions (+) e ânions (−)', 'Os elétrons livres da água', 'As moléculas neutras do soluto', 'As bolhas de ar da solução'],
+    exp:'Na solução, a corrente é feita pelo movimento dos íons, partículas com carga positiva ou negativa.' },
+  { id:'cations', q:'Com o circuito fechado, para onde se movem os cátions (íons positivos)?',
+    opts:['Para o eletrodo negativo', 'Para o eletrodo positivo', 'Ficam parados no meio da solução', 'Sobem para a superfície do líquido'],
+    exp:'Cargas opostas se atraem: os cátions (+) migram para o eletrodo negativo, e os ânions (−) para o positivo.' },
+  { id:'anions', q:'Com o circuito fechado, para onde se movem os ânions (íons negativos)?',
+    opts:['Para o eletrodo positivo', 'Para o eletrodo negativo', 'Para o fundo do béquer', 'Saem da solução pelos fios'],
+    exp:'Os ânions têm carga negativa e são atraídos pelo eletrodo positivo.' },
+  { id:'amonia', q:'Por que a amônia diluída conduz pouco?',
+    opts:['Ela forma poucos íons (NH₄⁺ e OH⁻) na água', 'Ela não se mistura com a água', 'Ela forma muitos íons, mas eles não se movem', 'Ela é um eletrólito forte muito concentrado'],
+    exp:'A amônia é um eletrólito fraco: só uma pequena parte dela forma íons na água.' },
+  { id:'ordem', q:'Com concentrações parecidas, qual é a ordem esperada de condutividade, da maior para a menor?',
+    opts:['Água com sal > vinagre > água com açúcar', 'Vinagre > água com sal > água com açúcar', 'Água com açúcar > vinagre > água com sal', 'Água com sal > água com açúcar > vinagre'],
+    exp:'O sal (eletrólito forte) forma muitos íons, o vinagre (eletrólito fraco) forma poucos e o açúcar (não eletrólito) não forma íons.' },
+  { id:'mais-acucar', q:'Se dobrarmos a quantidade de açúcar dissolvido, o que acontece com o LED?',
+    opts:['Continua apagado, porque o açúcar não forma íons', 'Acende fraco', 'Acende forte', 'Pisca, porque há mais moléculas'],
+    exp:'Mais moléculas neutras não criam cargas móveis. Sem íons, a condução continua desprezível.' },
+  { id:'led-forte', q:'No experimento, o que indica um LED aceso com brilho forte?',
+    opts:['Alta condutividade: há muitos íons livres na solução', 'Baixa condutividade: há poucos íons livres', 'Que a solução não contém íons', 'Que um eletrodo está fora da solução'],
+    exp:'O brilho do LED depende da corrente. Brilho forte indica muitos íons livres e alta condutividade.' },
+  { id:'led-fraco', q:'Um LED fraco no teste do vinagre indica que:',
+    opts:['Há poucos íons livres, e a corrente é pequena', 'Não há nenhum íon na solução', 'O circuito está aberto', 'A solução tem tantos íons quanto a água com sal'],
+    exp:'O LED fraco mostra que a corrente existe, mas é pequena. É o comportamento típico de um eletrólito fraco.' },
+  { id:'indicador', q:'No experimento, qual elemento mostra se a solução conduz corrente?',
+    opts:['O LED, que acende quando há corrente', 'A bateria, que muda de cor', 'O béquer, que esquenta', 'Os fios, que ficam mais grossos'],
+    exp:'O LED funciona como indicador: acende forte, fraco ou fica apagado conforme a corrente que atravessa a solução.' },
+  { id:'caminho', q:'Qual caminho a corrente percorre no circuito do laboratório?',
+    opts:['Bateria → eletrodo A → solução → eletrodo B → LED → bateria', 'Bateria → LED → bateria, sem passar pela solução', 'Bateria → solução → bateria, sem passar pelos eletrodos', 'Eletrodo A → eletrodo B pelo ar, por fora da solução'],
+    exp:'A solução faz parte do circuito: a corrente só se completa se passar por ela, de um eletrodo ao outro, e depois pelo LED.' }
+];
+
+const quiz = { items:[], idx:0, score:0, answered:false, results:[], lastIds:new Set(), started:false };
+
+function buildAttempt(){
+  /* prioriza questões que não caíram na tentativa anterior */
+  const fresh = shuffle(QUESTION_BANK.filter(q => !quiz.lastIds.has(q.id)));
+  const repeat = shuffle(QUESTION_BANK.filter(q => quiz.lastIds.has(q.id)));
+  const chosen = shuffle(fresh.concat(repeat).slice(0, QUIZ_LEN));
+  quiz.lastIds = new Set(chosen.map(q => q.id));
+  return chosen.map(q => ({ q:q.q, exp:q.exp, correctText:q.opts[0],
+    options:shuffle(q.opts.map((t, i) => ({ t, ok:i === 0 }))) }));
+}
+/* transições do quiz (curtas; desativadas com movimento reduzido) */
+let quizBusy = false;
+const canAnimate = el => !REDUCED_MOTION && typeof el.animate === 'function';
+
+/* troca lateral: o conteúdo atual sai para a esquerda e o novo entra pela direita */
+function slideSwap(el, render){
+  if(!canAnimate(el)){ render(); return Promise.resolve(); }
+  const out = el.animate([{ opacity:1, transform:'translateX(0)' }, { opacity:0, transform:'translateX(-28px)' }],
+                         { duration:170, easing:'ease-in', fill:'forwards' });
+  return out.finished.then(() => {
+    render();
+    const inn = el.animate([{ opacity:0, transform:'translateX(28px)' }, { opacity:1, transform:'translateX(0)' }],
+                           { duration:260, easing:'cubic-bezier(.2,.8,.2,1)' });
+    out.cancel();
+    return inn.finished;
+  });
+}
+/* troca vertical entre a pergunta e a tela final */
+function fadeSwap(outEl, inEl, prepare){
+  if(!canAnimate(outEl)){ prepare(); outEl.hidden = true; inEl.hidden = false; return Promise.resolve(); }
+  const out = outEl.animate([{ opacity:1, transform:'none' }, { opacity:0, transform:'translateY(-8px)' }],
+                            { duration:180, easing:'ease-in', fill:'forwards' });
+  return out.finished.then(() => {
+    prepare();
+    outEl.hidden = true; out.cancel(); inEl.hidden = false;
+    return inEl.animate([{ opacity:0, transform:'translateY(12px)' }, { opacity:1, transform:'none' }],
+                        { duration:300, easing:'cubic-bezier(.2,.8,.2,1)' }).finished;
+  });
+}
+
+function startQuiz(animated){
+  const reset = () => {
+    quiz.items = buildAttempt();
+    quiz.idx = 0; quiz.score = 0; quiz.results = []; quiz.started = true;
+    renderQuestion();
+  };
+  if(animated && !$('#quiz-final').hidden){
+    quizBusy = true;
+    fadeSwap($('#quiz-final'), $('#quiz-question'), reset).then(() => { quizBusy = false; });
+  } else {
+    reset();
+    $('#quiz-final').hidden = true;
+    $('#quiz-question').hidden = false;
+  }
+}
+function renderBar(justIdx){
+  $('#qz-bar').innerHTML = Array.from({ length:QUIZ_LEN }, (_, i) => {
+    let cls = '';
+    if(i < quiz.results.length) cls = quiz.results[i].ok ? 'ok' : 'bad';
+    else if(i === quiz.idx) cls = 'cur';
+    if(i === justIdx) cls += ' just';
+    return `<span class="${cls}"></span>`;
+  }).join('');
+}
+function renderQuestion(){
+  const item = quiz.items[quiz.idx];
+  quiz.answered = false;
+  $('#qz-num').textContent = quiz.idx + 1;
+  $('#qz-score').textContent = quiz.score;
+  renderBar();
+  $('#qz-q').textContent = item.q;
+  $('#qz-opts').innerHTML = item.options.map((o, i) =>
+    `<button class="quiz-opt" type="button" data-i="${i}"><span class="opt-letter">${'ABCD'[i]}</span><span class="opt-text">${o.t}</span></button>`).join('');
+  $('#qz-feedback').hidden = true;
+  const next = $('#qz-next');
+  next.disabled = true;
+  next.textContent = quiz.idx === QUIZ_LEN - 1 ? 'Ver resultado' : 'Próxima pergunta';
+}
+function answerQuestion(i){
+  if(quiz.answered || quizBusy) return;
+  quiz.answered = true;
+  const item = quiz.items[quiz.idx];
+  const ok = item.options[i].ok;
+  if(ok) quiz.score++;
+  quiz.results.push({ ok, q:item.q, correct:item.correctText });
+  $('#qz-opts').querySelectorAll('.quiz-opt').forEach((b, j) => {
+    b.disabled = true;
+    const letter = b.querySelector('.opt-letter');
+    if(item.options[j].ok){
+      b.classList.add('correct', ok ? 'pop' : 'reveal');
+      letter.textContent = '✓';
+      if(!ok) b.querySelector('.opt-text').insertAdjacentHTML('beforeend', '<span class="opt-tag">Resposta correta</span>');
+    } else if(j === i){
+      b.classList.add('wrong', 'shake');
+      letter.textContent = '✗';
+    } else {
+      b.classList.add('faded');
+    }
+  });
+  const fb = $('#qz-feedback');
+  fb.className = 'quiz-feedback ' + (ok ? 'ok' : 'bad');
+  $('#qz-fb-ico').textContent = ok ? '✓' : '✗';
+  $('#qz-fb-title').textContent = ok ? 'Correto!' : 'Resposta incorreta';
+  $('#qz-fb-text').textContent = (ok ? '' : `Resposta certa: ${item.correctText}. `) + item.exp;
+  fb.hidden = false;
+  const scoreEl = $('#qz-score');
+  scoreEl.textContent = quiz.score;
+  if(ok){ scoreEl.classList.remove('bump'); void scoreEl.offsetWidth; scoreEl.classList.add('bump'); }
+  renderBar(quiz.idx);
+  const next = $('#qz-next');
+  next.disabled = false;
+  next.focus({ preventScroll:true });
+  fb.scrollIntoView({ block:'nearest', behavior:REDUCED_MOTION ? 'auto' : 'smooth' });
+}
+function nextQuestion(){
+  if(!quiz.answered || quizBusy) return;
+  quizBusy = true;
+  quiz.idx++;
+  let done;
+  if(quiz.idx >= QUIZ_LEN){
+    done = fadeSwap($('#quiz-question'), $('#quiz-final'), fillFinal).then(animateRing);
+  } else {
+    $('#qz-next').disabled = true;
+    done = slideSwap($('#qz-stage'), renderQuestion);
+  }
+  scrollToContent();
+  done.then(() => { quizBusy = false; });
+}
+function fillFinal(){
+  const s = quiz.score;
+  const C = 2 * Math.PI * 56;
+  const ring = $('#qf-ring');
+  ring.style.strokeDasharray = C;
+  ring.style.strokeDashoffset = C;
+  ring.style.stroke = s >= 8 ? 'var(--green)' : (s >= 5 ? 'var(--amber)' : 'var(--coral)');
+  $('#qf-ring-num').textContent = s;
+  $('#qf-score').textContent = `Acertos: ${s}/${QUIZ_LEN}`;
+  let msg;
+  if(s === 10) msg = 'Excelente! Você dominou a relação entre íons, condutividade e o brilho do LED.';
+  else if(s >= 8) msg = 'Muito bom! Você entendeu bem o fenômeno. Revise só os pontos que errou.';
+  else if(s >= 6) msg = 'Bom resultado! Vale repetir alguns testes no laboratório.';
+  else if(s >= 4) msg = 'Você está no caminho. Reveja os Conceitos e teste de novo as soluções.';
+  else msg = 'Que tal recomeçar pelos Conceitos? Depois, teste as soluções no laboratório e tente outra vez.';
+  $('#qf-msg').textContent = msg;
+  const wrong = quiz.results.filter(r => !r.ok);
+  const review = $('#qf-review');
+  review.hidden = wrong.length === 0;
+  review.open = false;
+  $('#qf-review-sum').textContent = wrong.length === 1 ? 'Ver a questão que você errou' : `Ver as ${wrong.length} questões que você errou`;
+  $('#qf-review-list').innerHTML = wrong.map(r => `<div class="review-item"><b>${r.q}</b>Resposta certa: <span class="ans">${r.correct}</span></div>`).join('');
+}
+function animateRing(){
+  const C = 2 * Math.PI * 56;
+  requestAnimationFrame(() => requestAnimationFrame(() => { $('#qf-ring').style.strokeDashoffset = C * (1 - quiz.score / QUIZ_LEN); }));
+}
+function setupQuiz(){
+  $('#qz-opts').addEventListener('click', e => {
+    const b = e.target.closest('.quiz-opt');
+    if(b) answerQuestion(parseInt(b.dataset.i, 10));
+  });
+  $('#qz-next').addEventListener('click', nextQuestion);
+  $('#qf-restart').addEventListener('click', () => { if(!quizBusy){ startQuiz(true); scrollToContent(); } });
+}
+
+/* ======================================================================
+   NAVEGAÇÃO
+   ====================================================================== */
+function scrollToContent(){
+  const header = $('.site-header');
+  const top = header.offsetTop + header.offsetHeight;
+  if(window.scrollY > top) window.scrollTo({ top, behavior:REDUCED_MOTION ? 'auto' : 'smooth' });
+}
+function showView(name){
+  document.querySelectorAll('#area-nav button').forEach(b => {
+    const on = b.dataset.view === name;
+    b.classList.toggle('active', on);
+    if(on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+  if(name === 'quiz' && !quiz.started) startQuiz();
+  scrollToContent();
+}
+function setupNav(){
+  document.querySelectorAll('#area-nav button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-goto]');
+    if(go){ showView(go.dataset.goto); return; }
+    const test = e.target.closest('[data-test-sol]');
+    if(test){ showView('lab'); bench.setSolution(test.dataset.testSol); }
+  });
+}
+
+/* ===================== COMO USAR ===================== */
+function setupHowto(){
+  const overlay = $('#howto-overlay');
+  const openBtn = $('#howto-open-btn');
+  const open = () => { overlay.classList.add('show'); $('#howto-close-btn').focus(); };
+  const close = () => { overlay.classList.remove('show'); openBtn.focus(); };
+  openBtn.addEventListener('click', open);
+  $('#howto-close-btn').addEventListener('click', close);
+  $('#howto-start-btn').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if(e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape' && overlay.classList.contains('show')) close(); });
+}
+
+/* ===================== INIT ===================== */
+function init(){
+  setupConcepts();
+  setupLab();
+  setupQuiz();
+  setupNav();
+  setupHowto();
+  requestAnimationFrame(mainLoop);
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
+})();
+</script>
+</body>
+</html>
